@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using StatusBoard.Core;
+using System.Threading.Tasks;
 
 namespace StatusBoard.Demo.Checks
 {
@@ -16,12 +17,13 @@ namespace StatusBoard.Demo.Checks
             }
         }
 
-        public override CheckResult GetCurrentStatus()
+        public override Task<CheckResult> GetCurrentStatus()
         {
-            return new CheckResult
+            return Task.Run(() =>
+            new CheckResult
             {
                  StatusValue = StatusValue.OK,
-            };
+            });
         }
     }
 }

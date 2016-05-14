@@ -47,14 +47,14 @@ namespace StatusBoard.Core
             return WebResponse.JsonResponse(response);
         }
 
-        public WebResponse RunCheck(string checkId)
+        public async Task<WebResponse> RunCheck(string checkId)
         {
             var check = checks.SingleOrDefault(c => c.CheckId == checkId);
             if (check == null)
             {
                 throw new ArgumentException($"Check id {checkId} does not exist.", nameof(checkId));
             }
-            var checkResult = check.GetCurrentStatus();
+            var checkResult = await check.GetCurrentStatus();
             var response = new
             {
                 CurrentTime = DateTime.Now.ToString("u"),
@@ -63,11 +63,13 @@ namespace StatusBoard.Core
             return WebResponse.JsonResponse(response);
         }
 
-        public WebResponse RunAllChecks()
+        public async Task<WebResponse> RunAllChecks()
         {
-            var checkResults = checks.Select(check => check.GetCurrentStatus().StatusValue).ToList();
-            var worstResult = checkResults.Max();
-            var message = string.Join(", ", checkResults.GroupBy(r => r).OrderByDescending(g => g.Key).Select(g => $"{g.Key} = {g.Count()}"));
+            var allAsyncChecks = checks.Select(check => check.GetCurrentStatus());
+            var checkResults = (await Task.WhenAll(allAsyncChecks));
+            var statusValues = checkResults.Select(r => r.StatusValue);
+            var worstResult = statusValues.Max();
+            var message = string.Join(", ", statusValues.GroupBy(r => r).OrderByDescending(g => g.Key).Select(g => $"{g.Key} = {g.Count()}"));
             return WebResponse.JsonResponse(new
             {
                 CurrentTime = DateTime.Now.ToString("u"),

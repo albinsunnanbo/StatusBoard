@@ -53,13 +53,13 @@ namespace StatusBoard.Owin
                 if (remainingLevel1.StartsWithSegments(new PathString("/Check"), out remainingLevel2))
                 {
                     var checkId = remainingLevel2.Value.TrimStart('/');
-                    var webResponse = options.RunCheck(checkId);
+                    var webResponse = await options.RunCheck(checkId);
                     context.WriteToOwinContext(webResponse);
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAll"), out remainingLevel2))
                 {
-                    var webResponse = options.RunAllChecks();
+                    var webResponse = await options.RunAllChecks();
                     context.WriteToOwinContext(webResponse);
                     return;
                 }

@@ -18,6 +18,6 @@ namespace StatusBoard.Core
             }
         }
 
-        public abstract CheckResult GetCurrentStatus();
+        public abstract Task<CheckResult> GetCurrentStatus();
     }
 }

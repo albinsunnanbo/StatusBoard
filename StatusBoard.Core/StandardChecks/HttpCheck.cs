@@ -24,12 +24,12 @@ namespace StatusBoard.Core.StandardChecks
                 return $"Download {uri}";
             }
         }
-        public override CheckResult GetCurrentStatus()
+        public async override Task<CheckResult> GetCurrentStatus()
         {
             try
             {
                 System.Net.WebClient wc = new System.Net.WebClient();
-                wc.DownloadString(uri);
+                var result = await wc.DownloadStringTaskAsync(uri);
                 return new CheckResult
                 {
                     StatusValue = StatusValue.OK,
