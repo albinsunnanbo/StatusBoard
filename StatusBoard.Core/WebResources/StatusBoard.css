@@ -1,0 +1,21 @@
+﻿
+#status-board-checks-placeholder .status-OK {
+    background-color: lawngreen;
+}
+
+#status-board-checks-placeholder .status-WARNING {
+    background-color: orange;
+}
+
+#status-board-checks-placeholder .status-ERROR {
+    background-color: tomato;
+}
+
+#status-board-checks-placeholder .status-loading {
+    background-color: lightblue;
+}
+
+#status-board-checks-placeholder {
+    font-family: monospace;
+    font-size: xx-large;
+}
