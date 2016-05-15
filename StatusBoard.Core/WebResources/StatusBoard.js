@@ -24,8 +24,8 @@
 
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                resultElement.text("ERROR in response");
-                resultElement.addClass("fail");
+                resultElement.find('td.check-result').text("SERVER ERROR");
+                resultElement.removeClass('status-loading').addClass('status-ERROR');
             }
         });
 

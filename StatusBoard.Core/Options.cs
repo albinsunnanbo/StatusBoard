@@ -65,21 +65,37 @@ namespace StatusBoard.Core
 
         public async Task<WebResponse> RunAllChecks()
         {
-            var allAsyncChecks = checks.Select(check => check.GetCurrentStatus());
-            var checkResults = (await Task.WhenAll(allAsyncChecks));
-            var statusValues = checkResults.Select(r => r.StatusValue);
-            var worstResult = statusValues.Max();
-            var message = string.Join(", ", statusValues.GroupBy(r => r).OrderByDescending(g => g.Key).Select(g => $"{g.Key} = {g.Count()}"));
-            return WebResponse.JsonResponse(new
+            try
             {
-                CurrentTime = DateTime.Now.ToString("u"),
-                CheckResult = new CheckResult
+                var allAsyncChecks = checks.Select(check => check.GetCurrentStatus());
+                var checkResults = (await Task.WhenAll(allAsyncChecks));
+                var statusValues = checkResults.Select(r => r.StatusValue);
+                var worstResult = statusValues.Max();
+                var message = string.Join(", ", statusValues.GroupBy(r => r).OrderByDescending(g => g.Key).Select(g => $"{g.Key} = {g.Count()}"));
+                return WebResponse.JsonResponse(new
                 {
-                    StatusValue = worstResult,
-                    Message = message,
-                },
+                    CurrentTime = DateTime.Now.ToString("u"),
+                    CheckResult = new CheckResult
+                    {
+                        StatusValue = worstResult,
+                        Message = message,
+                    },
+                }
+                );
             }
-            );
+            catch (Exception)
+            {
+                return WebResponse.JsonResponse(new
+                {
+                    CurrentTime = DateTime.Now.ToString("u"),
+                    CheckResult = new CheckResult
+                    {
+                        StatusValue = StatusValue.ERROR,
+                        Message = "At least one Check throw an exception",
+                    },
+                }
+                );
+            }
         }
     }
 }
