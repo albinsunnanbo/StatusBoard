@@ -14,6 +14,7 @@ namespace StatusBoard.Core
         public string StatusPageJs { get; set; } = Properties.Resources.StatusBoard_js;
         public string StatusPageCss { get; set; } = Properties.Resources.StatusBoard_css;
         public string StatusPageJquery { get; set; } = Properties.Resources.jquery_2_2_3_min;
+        public Func<StatusCheck, Exception, CheckResult> CheckErrorHandler { get; set; } = DefaultCheckErrorHandler;
 
         public Options(IEnumerable<StatusCheck> checks)
         {
@@ -37,6 +38,18 @@ namespace StatusBoard.Core
             return WebResponse.JavaScriptResponse(StatusPageJquery);
         }
 
+        private static CheckResult DefaultCheckErrorHandler(StatusCheck check, Exception ex)
+        {
+            // If you copy'n paste this code, this is where you insert your custom logger!
+            System.Diagnostics.Trace.WriteLine($"Check {check.CheckId} failed with exeption {ex}");
+
+            return new CheckResult
+            {
+                StatusValue = StatusValue.ERROR,
+                Message = "Oopsie daisy. That one didn't go as planned.",
+            };
+        }
+
         public WebResponse GetDirectoryListing()
         {
             var response = new
@@ -54,7 +67,7 @@ namespace StatusBoard.Core
             {
                 throw new ArgumentException($"Check id {checkId} does not exist.", nameof(checkId));
             }
-            var checkResult = await check.GetCurrentStatus();
+            CheckResult checkResult = await RunOneCheck(check);
             var response = new
             {
                 CurrentTime = DateTime.Now.ToString("u"),
@@ -63,39 +76,38 @@ namespace StatusBoard.Core
             return WebResponse.JsonResponse(response);
         }
 
-        public async Task<WebResponse> RunAllChecks()
+        private async Task<CheckResult> RunOneCheck(StatusCheck check)
         {
+            CheckResult checkResult;
             try
             {
-                var allAsyncChecks = checks.Select(check => check.GetCurrentStatus());
-                var checkResults = (await Task.WhenAll(allAsyncChecks));
-                var statusValues = checkResults.Select(r => r.StatusValue);
-                var worstResult = statusValues.Max();
-                var message = string.Join(", ", statusValues.GroupBy(r => r).OrderByDescending(g => g.Key).Select(g => $"{g.Key} = {g.Count()}"));
-                return WebResponse.JsonResponse(new
-                {
-                    CurrentTime = DateTime.Now.ToString("u"),
-                    CheckResult = new CheckResult
-                    {
-                        StatusValue = worstResult,
-                        Message = message,
-                    },
-                }
-                );
+                checkResult = await check.GetCurrentStatus();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return WebResponse.JsonResponse(new
-                {
-                    CurrentTime = DateTime.Now.ToString("u"),
-                    CheckResult = new CheckResult
-                    {
-                        StatusValue = StatusValue.ERROR,
-                        Message = "At least one Check throw an exception",
-                    },
-                }
-                );
+                checkResult = CheckErrorHandler(check, ex);
             }
+
+            return checkResult;
+        }
+
+        public async Task<WebResponse> RunAllChecks()
+        {
+            var allAsyncChecks = checks.Select(check => RunOneCheck(check));
+            var checkResults = (await Task.WhenAll(allAsyncChecks));
+            var statusValues = checkResults.Select(r => r.StatusValue);
+            var worstResult = statusValues.Max();
+            var message = string.Join(", ", statusValues.GroupBy(r => r).OrderByDescending(g => g.Key).Select(g => $"{g.Key} = {g.Count()}"));
+            return WebResponse.JsonResponse(new
+            {
+                CurrentTime = DateTime.Now.ToString("u"),
+                CheckResult = new CheckResult
+                {
+                    StatusValue = worstResult,
+                    Message = message,
+                },
+            }
+            );
         }
     }
 }
