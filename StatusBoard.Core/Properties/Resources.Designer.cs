@@ -71,9 +71,28 @@ namespace StatusBoard.Core.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to body
-        ///{
-        ///}.
+        ///   Looks up a localized string similar to 
+        ///#status-board-checks-placeholder .status-OK {
+        ///    background-color: lawngreen;
+        ///}
+        ///
+        ///#status-board-checks-placeholder .status-WARNING {
+        ///    background-color: orange;
+        ///}
+        ///
+        ///#status-board-checks-placeholder .status-ERROR {
+        ///    background-color: tomato;
+        ///}
+        ///
+        ///#status-board-checks-placeholder .status-loading {
+        ///    background-color: lightblue;
+        ///}
+        ///
+        ///#status-board-checks-placeholder {
+        ///    font-family: monospace;
+        ///    font-size: xx-large;
+        ///}
+        ///.
         /// </summary>
         internal static string StatusBoard_css {
             get {
@@ -82,7 +101,22 @@ namespace StatusBoard.Core.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to (function () {
+        ///    &quot;use strict&quot;;
+        ///
+        ///    var addCheck = function (check) {
+        ///        var resultElement = $(
+        ///            &quot;&lt;tr class=&apos;status-loading&apos;&gt;&quot; +
+        ///            &quot;&lt;td class=&apos;check-result&apos;&gt;...&lt;/td&gt;&quot; +
+        ///            &quot;&lt;td class=&apos;check-name&apos;&gt;&quot; + check.Name + &quot;&lt;/td&gt;&quot; +
+        ///            &quot;&lt;td class=&apos;check-message&apos;&gt;&lt;/td&gt;&quot; +
+        ///            &quot;&lt;/tr&gt;&quot;);
+        ///        $.ajax(
+        ///        {
+        ///            type: &quot;POST&quot;,
+        ///            async: true,
+        ///            url: &quot;Status/Check/&quot; + check.CheckId,
+        ///            data: &quot;{&apos;id&apos;: &apos;&quot; + resultEle [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string StatusBoard_js {
             get {
@@ -97,12 +131,18 @@ namespace StatusBoard.Core.Properties {
         ///&lt;head&gt;
         ///    &lt;meta charset=&quot;utf-8&quot; /&gt;
         ///    &lt;title&gt;&lt;/title&gt;
+        ///    &lt;script src=&quot;status/jQuery&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+        ///    &lt;script src=&quot;status/js&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+        ///    &lt;link href=&quot;status/css&quot; rel=&quot;stylesheet&quot; /&gt;
         ///&lt;/head&gt;
         ///&lt;body&gt;
         ///    &lt;h1&gt;Status board&lt;/h1&gt;
-        ///    &lt;div id=&quot;status-board-checks-placeholder&quot;&gt;&lt;/div&gt;
-        ///&lt;/body&gt;
-        ///&lt;/html&gt;.
+        ///    &lt;div id=&quot;status-board-checks-placeholder&quot;&gt;
+        ///        &lt;table&gt;
+        ///            &lt;thead&gt;
+        ///                &lt;tr&gt;
+        ///                    &lt;th&gt;Result&lt;/th&gt;
+        ///              [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string StatusPage_html {
             get {
