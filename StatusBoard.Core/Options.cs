@@ -43,11 +43,7 @@ namespace StatusBoard.Core
             // If you copy'n paste this code, this is where you insert your custom logger!
             System.Diagnostics.Trace.WriteLine($"Check {check.CheckId} failed with exeption {ex}");
 
-            return new CheckResult
-            {
-                StatusValue = StatusValue.ERROR,
-                Message = "Oopsie daisy. That one didn't go as planned.",
-            };
+            return CheckResult.ResultError("Oopsie daisy. That one didn't go as planned.");
         }
 
         public WebResponse GetDirectoryListing()
@@ -101,11 +97,7 @@ namespace StatusBoard.Core
             return WebResponse.JsonResponse(new
             {
                 CurrentTime = DateTime.Now.ToString("u"),
-                CheckResult = new CheckResult
-                {
-                    StatusValue = worstResult,
-                    Message = message,
-                },
+                CheckResult = new CheckResult(worstResult, message),
             }
             );
         }

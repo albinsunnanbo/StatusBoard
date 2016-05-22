@@ -20,11 +20,7 @@ namespace StatusBoard.Demo.Checks
         public async override Task<CheckResult> GetCurrentStatus()
         {
             await Task.Delay(2500);
-            return new CheckResult
-            {
-                StatusValue = StatusValue.OK,
-                Message = "Worth waiting for?",
-            };
+            return CheckResult.ResultOk("Worth waiting for?");
         }
     }
 }

@@ -30,18 +30,11 @@ namespace StatusBoard.Core.StandardChecks
             {
                 System.Net.WebClient wc = new System.Net.WebClient();
                 var result = await wc.DownloadStringTaskAsync(uri);
-                return new CheckResult
-                {
-                    StatusValue = StatusValue.OK,
-                };
+                return CheckResult.ResultOk();
             }
             catch (Exception)
             {
-                return new CheckResult
-                {
-                    StatusValue = StatusValue.ERROR,
-                    Message = "Failed to download",
-                };
+                return CheckResult.ResultError("Failed to download");
             }
         }
     }
