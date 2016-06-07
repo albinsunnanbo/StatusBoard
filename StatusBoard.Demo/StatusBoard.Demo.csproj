@@ -66,6 +66,7 @@
     </Compile>
     <Compile Include="Checks\AlwaysCrashingCheck.cs" />
     <Compile Include="Checks\AlwaysErrorCheck.cs" />
+    <Compile Include="Checks\HtmlMessageCheck.cs" />
     <Compile Include="Checks\LongRunningCheck.cs" />
     <Compile Include="Checks\AlwaysWarningCheck.cs" />
     <Compile Include="Checks\AlwaysOkCheck.cs" />

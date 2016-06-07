@@ -15,14 +15,17 @@ namespace StatusBoard.Core
 
         public string Message { get; private set; }
 
+        public bool UseHtml { get; private set; }
+
         public CheckResult(StatusValue statusValue)
         {
             StatusValue = statusValue;
         }
 
-        public CheckResult(StatusValue statusValue, string message) : this(statusValue)
+        public CheckResult(StatusValue statusValue, string message, bool useHtml = false) : this(statusValue)
         {
             Message = message;
+            UseHtml = useHtml;
         }
 
         public static CheckResult ResultOk()
@@ -30,19 +33,19 @@ namespace StatusBoard.Core
             return new CheckResult(StatusValue.OK);
         }
 
-        public static CheckResult ResultOk(string message)
+        public static CheckResult ResultOk(string message, bool useHtml = false)
         {
-            return new CheckResult(StatusValue.OK, message);
+            return new CheckResult(StatusValue.OK, message, useHtml);
         }
 
-        public static CheckResult ResultWarning(string message)
+        public static CheckResult ResultWarning(string message, bool useHtml = false)
         {
-            return new CheckResult(StatusValue.WARNING, message);
+            return new CheckResult(StatusValue.WARNING, message, useHtml);
         }
 
-        public static CheckResult ResultError(string message)
+        public static CheckResult ResultError(string message, bool useHtml = false)
         {
-            return new CheckResult(StatusValue.ERROR, message);
+            return new CheckResult(StatusValue.ERROR, message, useHtml);
         }
     }
 }

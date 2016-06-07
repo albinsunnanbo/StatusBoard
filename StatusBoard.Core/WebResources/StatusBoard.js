@@ -20,7 +20,13 @@
                 var checkResult = data.CheckResult;
                 resultElement.removeClass('status-loading').addClass('status-' + checkResult.StatusValue);
                 resultElement.find('td.check-result').text(checkResult.StatusValue);
-                resultElement.find('td.check-message').text(checkResult.Message);
+                var messageElement = resultElement.find('td.check-message');
+                if (checkResult.UseHtml) {
+                    messageElement.html(checkResult.Message);
+                }
+                else {
+                    messageElement.text(checkResult.Message);
+                }
 
             },
             error: function (jqXHR, textStatus, errorThrown) {
