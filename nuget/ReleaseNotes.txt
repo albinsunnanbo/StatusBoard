@@ -1,1 +1,3 @@
+v0.0.4 Remove jQuery dependency
+
 v0.0.2 Initial release
