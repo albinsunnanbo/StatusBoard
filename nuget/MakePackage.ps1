@@ -82,7 +82,7 @@ If((Test-Path -Path $pwd\nuget\nuget.exe) -eq $false) {
 
 echo "Building package..."
 
-.\nuget\nuget.exe pack -build -outputdirectory nuget StatusBoard.Owin\StatusBoard.Owin.csproj
+.\nuget\nuget.exe pack -IncludeReferencedProjects -build -outputdirectory nuget StatusBoard.Owin\StatusBoard.Owin.csproj
 
 $version = Increment-PatchNumber
 Set-Version($version)
