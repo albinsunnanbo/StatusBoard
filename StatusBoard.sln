@@ -9,6 +9,21 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusBoard.Demo", "StatusB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusBoard.Core", "StatusBoard.Core\StatusBoard.Core.csproj", "{76D416DA-32FA-4408-AEA5-9E751BB83D31}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{B5DEBB8F-F371-47E1-A774-FFB19FA9AD7B}"
+	ProjectSection(SolutionItems) = preProject
+		nuget\MakePackage.ps1 = nuget\MakePackage.ps1
+		nuget\ReleaseNotes.txt = nuget\ReleaseNotes.txt
+		nuget\StatusBoard.Owin.nuspec = nuget\StatusBoard.Owin.nuspec
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A0480AF8-4A10-4C15-9528-D495C673854E}"
+	ProjectSection(SolutionItems) = preProject
+		CONTRIBUTORS.txt = CONTRIBUTORS.txt
+		LICENSE = LICENSE
+		README.md = README.md
+		VersionInfo.cs = VersionInfo.cs
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

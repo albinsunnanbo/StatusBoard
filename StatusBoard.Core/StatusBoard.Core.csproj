@@ -40,6 +40,9 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\VersionInfo.cs">
+      <Link>VersionInfo.cs</Link>
+    </Compile>
     <Compile Include="CheckResult.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

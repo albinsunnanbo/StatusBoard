@@ -44,6 +44,9 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\VersionInfo.cs">
+      <Link>VersionInfo.cs</Link>
+    </Compile>
     <Compile Include="AppBuilderExtensions.cs" />
     <Compile Include="OwinExtensions.cs" />
     <Compile Include="StatusBoardMiddleware.cs" />
