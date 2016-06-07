@@ -13,7 +13,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>StatusBoard.Demo</RootNamespace>
-    <AssemblyName>StatusBoard.Demo</AssemblyName>
+    <AssemblyName>ASP.NET-StatusBoard.Demo</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>

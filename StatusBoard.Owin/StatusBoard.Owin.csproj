@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>StatusBoard.Owin</RootNamespace>
-    <AssemblyName>StatusBoard.Owin</AssemblyName>
+    <AssemblyName>ASP.NET-StatusBoard.Owin</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
