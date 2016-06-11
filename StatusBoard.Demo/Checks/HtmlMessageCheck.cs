@@ -19,7 +19,7 @@ namespace StatusBoard.Demo.Checks
 
         public override Task<CheckResult> GetCurrentStatus()
         {
-            return Task.Run(() => CheckResult.ResultOk("<h1>Larger than life!</h1>", true));
+            return Task.FromResult(CheckResult.ResultOk("<h1>Larger than life!</h1>", true));
         }
     }
 }

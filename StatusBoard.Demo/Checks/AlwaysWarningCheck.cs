@@ -19,7 +19,7 @@ namespace StatusBoard.Demo.Checks
 
         public override Task<CheckResult> GetCurrentStatus()
         {
-            return Task.Run(() => CheckResult.ResultWarning("Warning message"));
+            return Task.FromResult(CheckResult.ResultWarning("Warning message"));
         }
     }
 }

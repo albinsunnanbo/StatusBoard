@@ -19,7 +19,7 @@ namespace StatusBoard.Demo.Checks
 
         public override Task<CheckResult> GetCurrentStatus()
         {
-            return Task.Run(() => CheckResult.ResultError("Error message"));
+            return Task.FromResult(CheckResult.ResultError("Error message"));
         }
     }
 }
