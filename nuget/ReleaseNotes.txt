@@ -1,5 +1,5 @@
 v0.0.10 CheckAllFailOnWarning and CheckAllFailOnError operations
-v0.0.8  Link to JSON version from HTML status page
-v0.0.6  Optional HTML formatting of the message column
-v0.0.4  Remove jQuery dependency
-v0.0.2  Initial release
+v0.0.08 Link to JSON version from HTML status page
+v0.0.06 Optional HTML formatting of the message column
+v0.0.04 Remove jQuery dependency
+v0.0.02 Initial release
