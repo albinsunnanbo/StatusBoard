@@ -14,7 +14,6 @@
             type: "POST",
             async: true,
             url: "Status/Check/" + check.CheckId,
-            data: "{'id': '" + resultElement.attr("id") + "'}",
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (data) {
