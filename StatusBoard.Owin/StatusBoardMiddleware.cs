@@ -63,6 +63,18 @@ namespace StatusBoard.Owin
                     context.WriteToOwinContext(webResponse);
                     return;
                 }
+                if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllFailOnWarning"), out remainingLevel2))
+                {
+                    var webResponse = await options.RunAllChecks(StatusValue.WARNING);
+                    context.WriteToOwinContext(webResponse);
+                    return;
+                }
+                if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllFailOnError"), out remainingLevel2))
+                {
+                    var webResponse = await options.RunAllChecks(StatusValue.ERROR);
+                    context.WriteToOwinContext(webResponse);
+                    return;
+                }
                 context.Response.Write("Invalid status request");
                 return;
             }

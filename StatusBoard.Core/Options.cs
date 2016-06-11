@@ -87,18 +87,26 @@ namespace StatusBoard.Core
             return checkResult;
         }
 
-        public async Task<WebResponse> RunAllChecks()
+        public async Task<WebResponse> RunAllChecks(StatusValue? failLevel = null)
         {
             var allAsyncChecks = checks.Select(check => RunOneCheck(check));
             var checkResults = (await Task.WhenAll(allAsyncChecks));
             var statusValues = checkResults.Select(r => r.StatusValue);
             var worstResult = statusValues.Max();
             var message = string.Join(", ", statusValues.GroupBy(r => r).OrderByDescending(g => g.Key).Select(g => $"{g.Key} = {g.Count()}"));
+
+            int httpStatusCode = 200;
+            if (failLevel.HasValue && worstResult >= failLevel)
+            {
+                httpStatusCode = 500;
+            }
+
             return WebResponse.JsonResponse(new
             {
                 CurrentTime = DateTime.Now.ToString("u"),
                 CheckResult = new CheckResult(worstResult, message),
-            }
+            },
+            httpStatusCode
             );
         }
     }

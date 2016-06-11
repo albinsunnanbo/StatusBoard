@@ -13,6 +13,10 @@ namespace StatusBoard.Owin
         public static void WriteToOwinContext(this IOwinContext context, WebResponse webResponse)
         {
             context.Response.ContentType = webResponse.ContentType;
+            if (webResponse.HttpStatusCode.HasValue)
+            {
+                context.Response.StatusCode = webResponse.HttpStatusCode.Value;
+            }
             context.Response.Write(webResponse.Content);
         }
     }

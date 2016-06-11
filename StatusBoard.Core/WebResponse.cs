@@ -10,9 +10,11 @@ namespace StatusBoard.Core
     {
         readonly string content;
         readonly string contentType;
+        readonly int? httpStatusCode;
 
-        public WebResponse(string content, string contentType)
+        public WebResponse(string content, string contentType, int? httpStatusCode = null)
         {
+            this.httpStatusCode = httpStatusCode;
             this.contentType = contentType;
             this.content = content;
         }
@@ -33,9 +35,17 @@ namespace StatusBoard.Core
             }
         }
 
-        public static WebResponse JsonResponse(string content)
+        public int? HttpStatusCode
         {
-            return new WebResponse(content, "application/json");
+            get
+            {
+                return httpStatusCode;
+            }
+        }
+
+        public static WebResponse JsonResponse(string content, int? httpStatusCode = null)
+        {
+            return new WebResponse(content, "application/json", httpStatusCode);
         }
 
         public static WebResponse HtmlResponse(string content)
@@ -52,11 +62,11 @@ namespace StatusBoard.Core
         {
             return new WebResponse(content, "text/css; charset=utf-8");
         }
-        
-        public static WebResponse JsonResponse(object content)
+
+        public static WebResponse JsonResponse(object content, int? httpStatusCode = null)
         {
             var jsonResponse = Newtonsoft.Json.JsonConvert.SerializeObject(content);
-            return JsonResponse(jsonResponse);
+            return JsonResponse(jsonResponse, httpStatusCode);
         }
     }
 }
