@@ -6,6 +6,7 @@
             "<tr class='status-loading'>" +
             "<td class='check-result'>...</td>" +
             "<td class='check-name'>" + check.Name + "</td>" +
+            "<td class='check-duration'></td>" +
             "<td class='check-message'></td>" +
             "</tr>");
         $.ajax(
@@ -20,6 +21,7 @@
                 var checkResult = data.CheckResult;
                 resultElement.removeClass('status-loading').addClass('status-' + checkResult.StatusValue);
                 resultElement.find('td.check-result').text(checkResult.StatusValue);
+                resultElement.find('td.check-duration').text(data.Duration);
                 var messageElement = resultElement.find('td.check-message');
                 if (checkResult.UseHtml) {
                     messageElement.html(checkResult.Message);

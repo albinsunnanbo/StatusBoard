@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -63,11 +64,14 @@ namespace StatusBoard.Core
             {
                 throw new ArgumentException($"Check id {checkId} does not exist.", nameof(checkId));
             }
+            var timer = Stopwatch.StartNew();
             CheckResult checkResult = await RunOneCheck(check);
+            timer.Stop();
             var response = new
             {
                 CurrentTime = DateTime.Now.ToString("u"),
                 CheckResult = checkResult,
+                Duration = $"{Math.Round(timer.Elapsed.TotalMilliseconds, 0)} ms",
             };
             return WebResponse.JsonResponse(response);
         }
@@ -89,11 +93,13 @@ namespace StatusBoard.Core
 
         public async Task<WebResponse> RunAllChecks(StatusValue? failLevel = null)
         {
+            var timer = Stopwatch.StartNew();
             var allAsyncChecks = checks.Select(check => RunOneCheck(check));
             var checkResults = (await Task.WhenAll(allAsyncChecks));
             var statusValues = checkResults.Select(r => r.StatusValue);
             var worstResult = statusValues.Max();
             var message = string.Join(", ", statusValues.GroupBy(r => r).OrderByDescending(g => g.Key).Select(g => $"{g.Key} = {g.Count()}"));
+            timer.Stop();
 
             int httpStatusCode = 200;
             if (failLevel.HasValue && worstResult >= failLevel)
@@ -105,6 +111,7 @@ namespace StatusBoard.Core
             {
                 CurrentTime = DateTime.Now.ToString("u"),
                 CheckResult = new CheckResult(worstResult, message),
+                Duration = $"{Math.Round(timer.Elapsed.TotalMilliseconds, 0)} ms",
             },
             httpStatusCode
             );
