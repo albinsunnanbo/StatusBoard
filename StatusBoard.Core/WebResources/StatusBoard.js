@@ -1,4 +1,6 @@
-﻿(function () {
+﻿/// <reference path="c:\git\statusboard\statusboard.core\scripts\_references.js" />
+
+(function () {
     "use strict";
 
     var addCheck = function (check) {
@@ -62,8 +64,16 @@
                     placeHolder.addClass("fail");
                 }
             });
-
-
     });
 
+    // Show/hide JSON links
+    $(function () {
+        var jsonLinks = $("#JSON-links");
+        jsonLinks.hide(); // Initially hidden
+        var jsonLinksToggle = $("#JSON-links-toogle");
+        jsonLinksToggle.click(function (eventObject) {
+            eventObject.preventDefault();
+            jsonLinks.toggle();
+        });
+    });
 })();

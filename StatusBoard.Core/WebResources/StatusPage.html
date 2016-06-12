@@ -30,8 +30,11 @@
             </tbody>
         </table>
     </div>
-    <p><a href="Status/CheckAll">~/Status/CheckAll</a> Aggregated JSON result, check this from uptime monitor tools</p>
-    <p><a href="Status/CheckAllFailOnWarning">~/Status/CheckAllFailOnWarning</a> Aggregated JSON result, check this from uptime monitor tools, return HTTP Status 500 on warnings</p>
-    <p><a href="Status/CheckAllFailOnError">~/Status/CheckAllFailOnError</a> Aggregated JSON result, check this from uptime monitor tools, return HTTP Status 500 on errors</p>
+    <div><a href="#" id="JSON-links-toogle">JSON aggregated result</a></div>
+    <div id="JSON-links">
+        <p><a href="Status/CheckAll">~/Status/CheckAll</a> Aggregated JSON result, check this from uptime monitor tools, always returns HTTP 200</p>
+        <p><a href="Status/CheckAllFailOnWarning">~/Status/CheckAllFailOnWarning</a> Aggregated JSON result, same as above, but return HTTP Status 500 on warnings</p>
+        <p><a href="Status/CheckAllFailOnError">~/Status/CheckAllFailOnError</a> Aggregated JSON result, same as above, but return HTTP Status 500 on errors</p>
+    </div>
 </body>
 </html>
