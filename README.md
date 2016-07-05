@@ -1,6 +1,10 @@
 # StatusBoard
 Status board framework for .NET Web Applications
 
+Installation
+------------
+Install from NuGet: https://www.nuget.org/packages/ASP.NET-StatusBoard.Owin/
+
 Configure in the Owin Startup
 Optionally create an CheckErrorHandler for global error handling
 
@@ -28,6 +32,8 @@ Optionally create an CheckErrorHandler for global error handling
 		return CheckResult.ResultError($"An error occurred with LogId = {errorId}");
 	}
 
+Getting started
+---------------
 Once configured the StatusBoard is located on http://your-site.com/Status
 
 Checkout the demo project on GitHub.
