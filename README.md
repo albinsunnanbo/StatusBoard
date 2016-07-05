@@ -11,6 +11,7 @@ Optionally create an CheckErrorHandler for global error handling
 	private static void ConfigureStatusBoard(IAppBuilder app)
 	{
 		// Find all status available status checks
+		// Scan the assembly where you have implemented your StatusChecks
 		var statusChecks = StatusBoard.Core.Utilities.GetAllStatusChecksInAssembly(System.Reflection.Assembly.GetExecutingAssembly());
 		var options = new Options(statusChecks);
 		// Configure global error handler
