@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>StatusBoard.AspNetCore</RootNamespace>
-    <AssemblyName>StatusBoard.AspNetCore</AssemblyName>
+    <AssemblyName>ASP.NET-StatusBoard.AspNetCore</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

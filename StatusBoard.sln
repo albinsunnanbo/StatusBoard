@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{B5DEBB8F
 	ProjectSection(SolutionItems) = preProject
 		nuget\MakePackage.ps1 = nuget\MakePackage.ps1
 		nuget\ReleaseNotes.txt = nuget\ReleaseNotes.txt
+		nuget\StatusBoard.AspNetCore.nuspec = nuget\StatusBoard.AspNetCore.nuspec
 		nuget\StatusBoard.Owin.nuspec = nuget\StatusBoard.Owin.nuspec
 	EndProjectSection
 EndProject
