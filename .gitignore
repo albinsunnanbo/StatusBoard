@@ -236,3 +236,4 @@ _Pvt_Extensions
 .fake/
 nuget/nuget.exe
 StatusBoard.Owin/StatusBoard.Owin.nuspec
+project.fragment.lock.json
