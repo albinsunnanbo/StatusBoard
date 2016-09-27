@@ -42,7 +42,7 @@ namespace StatusBoard.Core
         private static CheckResult DefaultCheckErrorHandler(StatusCheck check, Exception ex)
         {
             // If you copy'n paste this code, this is where you insert your custom logger!
-            System.Diagnostics.Trace.WriteLine($"Check {check.CheckId} failed with exeption {ex}");
+            System.Diagnostics.Trace.WriteLine($"Check {check.CheckId} failed with exception {ex}");
 
             return CheckResult.ResultError("Oopsie daisy. That one didn't go as planned.");
         }
