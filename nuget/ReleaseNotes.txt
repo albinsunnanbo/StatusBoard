@@ -1,6 +1,5 @@
-v0.0.16 Standard check for certificate expiration warning
-v0.0.14 AspNetCore (Full Framework) version
-v0.0.12 Display duration
+v0.0.14 Standard check for certificate expiration warning
+v0.0.12 Display duration, AspNetCore (Full Framework) version
 v0.0.10 CheckAllFailOnWarning and CheckAllFailOnError operations
 v0.0.08 Link to JSON version from HTML status page
 v0.0.06 Optional HTML formatting of the message column
