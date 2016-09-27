@@ -59,7 +59,7 @@ namespace StatusBoard.Core.StandardChecks
 
                 if (_sslPolicyErrors != SslPolicyErrors.None)
                 {
-                    return CheckResult.ResultError($"Certificate is not valid with policy errors {_sslPolicyErrors}");
+                    return CheckResult.ResultError($"Certificate is not valid with policy errors {_sslPolicyErrors}, Expiry date: {expiryDate}");
                 }
 
                 ////convert the X509Certificate to an X509Certificate2 object by passing it into the constructor
@@ -68,7 +68,7 @@ namespace StatusBoard.Core.StandardChecks
                 //var isValid = cert2.Verify();
                 if (!isValid)
                 {
-                    return CheckResult.ResultError($"Certificate is not valid");
+                    return CheckResult.ResultError($"Certificate is not valid, Expiry date: {expiryDate}");
                 }
 
                 var date = DateTime.Parse(expiryDate);
