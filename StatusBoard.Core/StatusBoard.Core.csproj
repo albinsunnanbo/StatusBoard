@@ -50,7 +50,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="StandardChecks\GoogleCertificateCheck.cs" />
     <Compile Include="StandardChecks\GoogleHttpCheck.cs" />
+    <Compile Include="StandardChecks\CertificateCheck.cs" />
     <Compile Include="StandardChecks\HttpCheck.cs" />
     <Compile Include="StatusCheck.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
