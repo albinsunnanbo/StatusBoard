@@ -5,21 +5,21 @@ using System.Web;
 using StatusBoard.Core;
 using System.Threading.Tasks;
 
-namespace StatusBoard.Demo.Checks
+namespace StatusBoard.Owin.Demo.Checks
 {
-    public class AlwaysErrorCheck : Core.StatusCheck
+    public class AlwaysCrashingCheck : Core.StatusCheck
     {
         public override string Name
         {
             get
             {
-                return "Always ERROR";
+                return "Always Crashing";
             }
         }
 
         public override Task<CheckResult> GetCurrentStatus()
         {
-            return Task.FromResult(CheckResult.ResultError("Error message"));
+            throw new InvalidOperationException("Bam");
         }
     }
 }

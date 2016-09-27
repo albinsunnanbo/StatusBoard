@@ -41,6 +41,6 @@ The demoproject can be tested on http://statusboard-demo.azurewebsites.net/
 
 To create status checks, implement the abstract class `StatusCheck`.
 Examples from the demo project
-* Normal: https://github.com/albinsunnanbo/StatusBoard/blob/master/StatusBoard.Demo/Checks/AlwaysOkCheck.cs
-* Async:  https://github.com/albinsunnanbo/StatusBoard/blob/master/StatusBoard.Demo/Checks/LongRunningCheck.cs
-* Error:  https://github.com/albinsunnanbo/StatusBoard/blob/master/StatusBoard.Demo/Checks/AlwaysErrorCheck.cs
+* Normal: https://github.com/albinsunnanbo/StatusBoard/blob/master/StatusBoard.Owin.Demo/Checks/AlwaysOkCheck.cs
+* Async:  https://github.com/albinsunnanbo/StatusBoard/blob/master/StatusBoard.Owin.Demo/Checks/LongRunningCheck.cs
+* Error:  https://github.com/albinsunnanbo/StatusBoard/blob/master/StatusBoard.Owin.Demo/Checks/AlwaysErrorCheck.cs

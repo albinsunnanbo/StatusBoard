@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusBoard.Owin", "StatusBoard.Owin\StatusBoard.Owin.csproj", "{FFCC42F6-F42E-4C1C-AAD3-18BF3244EC46}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusBoard.Demo", "StatusBoard.Demo\StatusBoard.Demo.csproj", "{8052DA29-A2F8-4583-BA2E-CEA49B8F63C2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusBoard.Owin.Demo", "StatusBoard.Owin.Demo\StatusBoard.Owin.Demo.csproj", "{8052DA29-A2F8-4583-BA2E-CEA49B8F63C2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusBoard.Core", "StatusBoard.Core\StatusBoard.Core.csproj", "{76D416DA-32FA-4408-AEA5-9E751BB83D31}"
 EndProject

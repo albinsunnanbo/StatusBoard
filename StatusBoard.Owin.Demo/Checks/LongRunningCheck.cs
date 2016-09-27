@@ -5,7 +5,7 @@ using System.Web;
 using StatusBoard.Core;
 using System.Threading.Tasks;
 
-namespace StatusBoard.Demo.Checks
+namespace StatusBoard.Owin.Demo.Checks
 {
     public class LongRunningCheck : Core.StatusCheck
     {

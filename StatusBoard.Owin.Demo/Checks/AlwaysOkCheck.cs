@@ -5,21 +5,21 @@ using System.Web;
 using StatusBoard.Core;
 using System.Threading.Tasks;
 
-namespace StatusBoard.Demo.Checks
+namespace StatusBoard.Owin.Demo.Checks
 {
-    public class HtmlMessageCheck : Core.StatusCheck
+    public class AlwaysOkCheck : Core.StatusCheck
     {
         public override string Name
         {
             get
             {
-                return "HTML Message";
+                return "Always OK";
             }
         }
 
         public override Task<CheckResult> GetCurrentStatus()
         {
-            return Task.FromResult(CheckResult.ResultOk("<h1>Larger than life!</h1>", true));
+            return Task.FromResult(CheckResult.ResultOk());
         }
     }
 }

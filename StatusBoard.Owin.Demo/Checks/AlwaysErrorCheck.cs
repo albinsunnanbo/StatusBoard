@@ -5,21 +5,21 @@ using System.Web;
 using StatusBoard.Core;
 using System.Threading.Tasks;
 
-namespace StatusBoard.Demo.Checks
+namespace StatusBoard.Owin.Demo.Checks
 {
-    public class AlwaysWarningCheck : Core.StatusCheck
+    public class AlwaysErrorCheck : Core.StatusCheck
     {
         public override string Name
         {
             get
             {
-                return "Always Warning";
+                return "Always ERROR";
             }
         }
 
         public override Task<CheckResult> GetCurrentStatus()
         {
-            return Task.FromResult(CheckResult.ResultWarning("Warning message"));
+            return Task.FromResult(CheckResult.ResultError("Error message"));
         }
     }
 }

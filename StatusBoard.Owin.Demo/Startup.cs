@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-[assembly: OwinStartupAttribute(typeof(StatusBoard.Demo.Startup))]
-namespace StatusBoard.Demo
+[assembly: OwinStartupAttribute(typeof(StatusBoard.Owin.Demo.Startup))]
+namespace StatusBoard.Owin.Demo
 {
     public class Startup
     {
