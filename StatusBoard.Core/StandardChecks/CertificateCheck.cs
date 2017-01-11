@@ -30,6 +30,7 @@ namespace StatusBoard.Core.StandardChecks
         private X509Certificate _certificate;
         private bool isValid;
         private string expiryDate;
+        private string chainErrors = "";
         private bool ValidateServerCertificate(
             object sender,
             X509Certificate certificate,
@@ -43,6 +44,11 @@ namespace StatusBoard.Core.StandardChecks
 
             isValid = cert2.Verify();
             expiryDate = cert2.GetExpirationDateString();
+
+            foreach (X509ChainStatus chainStatus in chain.ChainStatus)
+            {
+                chainErrors += string.Format("Chain error: {0} {1}", chainStatus.Status, chainStatus.StatusInformation) + Environment.NewLine;
+            }
 
             return true; // Always return true at this stage, inspect sslPolicyErrors later
         }
@@ -59,7 +65,7 @@ namespace StatusBoard.Core.StandardChecks
 
                 if (_sslPolicyErrors != SslPolicyErrors.None)
                 {
-                    return CheckResult.ResultError($"Certificate is not valid with policy errors {_sslPolicyErrors}, Expiry date: {expiryDate}");
+                    return CheckResult.ResultError($"Certificate is not valid with policy errors {_sslPolicyErrors}. ChainErrors: {chainErrors}, Expiry date: {expiryDate}");
                 }
 
                 ////convert the X509Certificate to an X509Certificate2 object by passing it into the constructor
@@ -68,7 +74,7 @@ namespace StatusBoard.Core.StandardChecks
                 //var isValid = cert2.Verify();
                 if (!isValid)
                 {
-                    return CheckResult.ResultError($"Certificate is not valid, Expiry date: {expiryDate}");
+                    return CheckResult.ResultError($"Certificate is not valid. ChainErrors: {chainErrors}, Expiry date: {expiryDate}");
                 }
 
                 var date = DateTime.Parse(expiryDate);
