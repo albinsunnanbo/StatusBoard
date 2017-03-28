@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using StatusBoard.Core;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace StatusBoard.AspNetCore
 
         public static IApplicationBuilder UseStatusBoard(this IApplicationBuilder builder, Options options)
         {
-            return builder.UseMiddleware<StatusBoardMiddleware>(options);
+            return builder.UseMiddleware<StatusBoardMiddleware>(options, builder.ApplicationServices);
         }
     }
 }

@@ -59,13 +59,17 @@ namespace StatusBoard.Core
 
         public async Task<WebResponse> RunCheck(string checkId)
         {
+            return await RunCheck(checkId, check => check.GetCurrentStatus());
+        }
+        public async Task<WebResponse> RunCheck(string checkId, Func<StatusCheck, Task<CheckResult>> evaluator)
+        {
             var check = checks.SingleOrDefault(c => c.CheckId == checkId);
             if (check == null)
             {
                 throw new ArgumentException($"Check id {checkId} does not exist.", nameof(checkId));
             }
             var timer = Stopwatch.StartNew();
-            CheckResult checkResult = await RunOneCheck(check);
+            CheckResult checkResult = await RunOneCheck(check, evaluator);
             timer.Stop();
             var response = new
             {
@@ -76,12 +80,12 @@ namespace StatusBoard.Core
             return WebResponse.JsonResponse(response);
         }
 
-        private async Task<CheckResult> RunOneCheck(StatusCheck check)
+        private async Task<CheckResult> RunOneCheck(StatusCheck check, Func<StatusCheck, Task<CheckResult>> evaluator)
         {
             CheckResult checkResult;
             try
             {
-                checkResult = await check.GetCurrentStatus();
+                checkResult = await evaluator(check);
             }
             catch (Exception ex)
             {
@@ -91,10 +95,14 @@ namespace StatusBoard.Core
             return checkResult;
         }
 
-        public async Task<WebResponse> RunAllChecks(StatusValue? failLevel = null)
+        public async Task<WebResponse> RunAllChecks(StatusValue? failLevel = null, Func<StatusCheck, Task<CheckResult>> evaluator = null)
         {
+            if (evaluator == null)
+            {
+                evaluator = check => check.GetCurrentStatus();
+            }
             var timer = Stopwatch.StartNew();
-            var allAsyncChecks = checks.Select(check => RunOneCheck(check));
+            var allAsyncChecks = checks.Select(check => RunOneCheck(check, evaluator));
             var checkResults = (await Task.WhenAll(allAsyncChecks));
             var statusValues = checkResults.Select(r => r.StatusValue);
             var worstResult = statusValues.Max();

@@ -96,6 +96,7 @@
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StatusBoardMiddleware.cs" />
+    <Compile Include="StatusCheckCore.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\StatusBoard.Core\StatusBoard.Core.csproj">

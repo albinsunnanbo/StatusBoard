@@ -12,11 +12,23 @@ namespace StatusBoard.AspNetCore
     {
         readonly Core.Options options;
         readonly RequestDelegate next;
+        readonly IServiceProvider serviceProvider;
 
-        public StatusBoardMiddleware(RequestDelegate next, Options options)
+        public StatusBoardMiddleware(RequestDelegate next, Options options, IServiceProvider serviceProvider)
         {
+            this.serviceProvider = serviceProvider;
             this.next = next;
             this.options = options;
+        }
+
+        private async Task<CheckResult> EvaluateCoreCheck(StatusCheck check)
+        {
+            var coreCheck = check as StatusCheckCore;
+            if (coreCheck != null)
+            {
+                return await coreCheck.GetCurrentStatus(serviceProvider);
+            }
+            return await check.GetCurrentStatus();
         }
 
         public async Task Invoke(HttpContext context)
@@ -55,25 +67,25 @@ namespace StatusBoard.AspNetCore
                 if (remainingLevel1.StartsWithSegments(new PathString("/Check"), out remainingLevel2))
                 {
                     var checkId = remainingLevel2.Value.TrimStart('/');
-                    var webResponse = await options.RunCheck(checkId);
+                    var webResponse = await options.RunCheck(checkId, EvaluateCoreCheck);
                     await context.WriteToHttpContext(webResponse);
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAll"), out remainingLevel2))
                 {
-                    var webResponse = await options.RunAllChecks();
+                    var webResponse = await options.RunAllChecks(evaluator: EvaluateCoreCheck);
                     await context.WriteToHttpContext(webResponse);
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllFailOnWarning"), out remainingLevel2))
                 {
-                    var webResponse = await options.RunAllChecks(StatusValue.WARNING);
+                    var webResponse = await options.RunAllChecks(StatusValue.WARNING, EvaluateCoreCheck);
                     await context.WriteToHttpContext(webResponse);
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllFailOnError"), out remainingLevel2))
                 {
-                    var webResponse = await options.RunAllChecks(StatusValue.ERROR);
+                    var webResponse = await options.RunAllChecks(StatusValue.ERROR, EvaluateCoreCheck);
                     await context.WriteToHttpContext(webResponse);
                     return;
                 }
