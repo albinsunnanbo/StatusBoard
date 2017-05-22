@@ -1,3 +1,4 @@
+v0.0.20 Prevent Intranet Mode in Internet explorer
 v0.0.18 StatusCheckCore - ASP.NET Core check with Dependency Injection support
 v0.0.16 Display certificate chain errors
 v0.0.14 Standard check for certificate expiration warning
