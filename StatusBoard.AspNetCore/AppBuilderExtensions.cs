@@ -15,6 +15,10 @@ namespace StatusBoard.AspNetCore
         {
             return builder.UseStatusBoard(new Options(checks));
         }
+        public static void UseStatusBoard(this IApplicationBuilder app, IEnumerable<StatusCheck> checks, IEnumerable<Proxy> proxies)
+        {
+            app.UseStatusBoard(new Options(checks, proxies));
+        }
 
         public static IApplicationBuilder UseStatusBoard(this IApplicationBuilder builder, Options options)
         {

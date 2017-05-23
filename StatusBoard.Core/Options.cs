@@ -10,6 +10,7 @@ namespace StatusBoard.Core
     public class Options
     {
         readonly List<StatusCheck> checks;
+        readonly List<Proxy> proxies;
 
         public string StatusPageHtml { get; set; } = Properties.Resources.StatusPage_html;
         public string StatusPageJs { get; set; } = Properties.Resources.StatusBoard_js;
@@ -18,8 +19,13 @@ namespace StatusBoard.Core
         public Func<StatusCheck, Exception, CheckResult> CheckErrorHandler { get; set; } = DefaultCheckErrorHandler;
 
         public Options(IEnumerable<StatusCheck> checks)
+            : this(checks, Enumerable.Empty<Proxy>())
+        {
+        }
+        public Options(IEnumerable<StatusCheck> checks, IEnumerable<Proxy> proxies)
         {
             this.checks = checks.ToList();
+            this.proxies = proxies.ToList();
         }
 
         public WebResponse GetStartPage()
@@ -55,6 +61,24 @@ namespace StatusBoard.Core
                 Checks = checks,
             };
             return WebResponse.JsonResponse(response);
+        }
+
+        public WebResponse GetProxyListing()
+        {
+            var response = new
+            {
+                CurrentTime = DateTime.Now.ToString("u"),
+                Proxies = proxies.Select(p => new
+                {
+                    p.Title,
+                }),
+            };
+            return WebResponse.JsonResponse(response);
+        }
+
+        public Uri GetProxyBaseUri(int proxyId)
+        {
+            return proxies[proxyId].ProxyBaseUri;
         }
 
         public async Task<WebResponse> RunCheck(string checkId)
@@ -95,7 +119,7 @@ namespace StatusBoard.Core
             return checkResult;
         }
 
-        public async Task<WebResponse> RunAllChecks(StatusValue? failLevel = null, Func<StatusCheck, Task<CheckResult>> evaluator = null)
+        public async Task<WebResponse> RunAllChecks(StatusValue? failLevel = null, Func<StatusCheck, Task<CheckResult>> evaluator = null, bool checkProxies = true)
         {
             if (evaluator == null)
             {
@@ -105,8 +129,22 @@ namespace StatusBoard.Core
             var allAsyncChecks = checks.Select(check => RunOneCheck(check, evaluator));
             var checkResults = (await Task.WhenAll(allAsyncChecks));
             var statusValues = checkResults.Select(r => r.StatusValue);
-            var worstResult = statusValues.Max();
             var message = string.Join(", ", statusValues.GroupBy(r => r).OrderByDescending(g => g.Key).Select(g => $"{g.Key} = {g.Count()}"));
+            if (checkProxies)
+            {
+                foreach (var proxy in proxies)
+                {
+                    var url = proxy.ProxyBaseUri + "/CheckAllNoProxy";
+                    using (var wc = new System.Net.WebClient())
+                    {
+                        var result = await wc.DownloadStringTaskAsync(url);
+                        var allChecksResult = Newtonsoft.Json.JsonConvert.DeserializeObject<AllChecksResult>(result);
+                        statusValues = statusValues.Concat(new[] { allChecksResult.CheckResult.StatusValue });
+                        message += ", " + proxy.Title + ": " + allChecksResult.CheckResult.Message;
+                    }
+                }
+            }
+            var worstResult = statusValues.Max();
             timer.Stop();
 
             int httpStatusCode = 200;
@@ -115,7 +153,7 @@ namespace StatusBoard.Core
                 httpStatusCode = 500;
             }
 
-            return WebResponse.JsonResponse(new
+            return WebResponse.JsonResponse(new AllChecksResult
             {
                 CurrentTime = DateTime.Now.ToString("u"),
                 CheckResult = new CheckResult(worstResult, message),
