@@ -10,6 +10,7 @@ namespace StatusBoard.Core
     public class Options
     {
         readonly List<StatusCheck> checks;
+        readonly List<Proxy> proxies;
 
         public string StatusPageHtml { get; set; } = Properties.Resources.StatusPage_html;
         public string StatusPageJs { get; set; } = Properties.Resources.StatusBoard_js;
@@ -18,8 +19,13 @@ namespace StatusBoard.Core
         public Func<StatusCheck, Exception, CheckResult> CheckErrorHandler { get; set; } = DefaultCheckErrorHandler;
 
         public Options(IEnumerable<StatusCheck> checks)
+            : this(checks, Enumerable.Empty<Proxy>())
+        {
+        }
+        public Options(IEnumerable<StatusCheck> checks, IEnumerable<Proxy> proxies)
         {
             this.checks = checks.ToList();
+            this.proxies = proxies.ToList();
         }
 
         public WebResponse GetStartPage()
@@ -53,6 +59,16 @@ namespace StatusBoard.Core
             {
                 CurrentTime = DateTime.Now.ToString("u"),
                 Checks = checks,
+            };
+            return WebResponse.JsonResponse(response);
+        }
+
+        public WebResponse GetProxyListing()
+        {
+            var response = new
+            {
+                CurrentTime = DateTime.Now.ToString("u"),
+                Proxies = proxies,
             };
             return WebResponse.JsonResponse(response);
         }

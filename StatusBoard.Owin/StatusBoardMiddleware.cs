@@ -50,6 +50,19 @@ namespace StatusBoard.Owin
                     context.WriteToOwinContext(webResponse);
                     return;
                 }
+                if (remainingLevel1.StartsWithSegments(new PathString("/Proxy"), out remainingLevel2))
+                {
+                    if (remainingLevel2.HasValue)
+                    {
+                        throw new NotImplementedException();
+                    }
+                    else
+                    {
+                        var webResponse = options.GetProxyListing();
+                        context.WriteToOwinContext(webResponse);
+                        return;
+                    }
+                }
                 if (remainingLevel1.StartsWithSegments(new PathString("/Check"), out remainingLevel2))
                 {
                     var checkId = remainingLevel2.Value.TrimStart('/');
