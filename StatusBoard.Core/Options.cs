@@ -119,7 +119,7 @@ namespace StatusBoard.Core
             return checkResult;
         }
 
-        public async Task<WebResponse> RunAllChecks(StatusValue? failLevel = null, Func<StatusCheck, Task<CheckResult>> evaluator = null)
+        public async Task<WebResponse> RunAllChecks(StatusValue? failLevel = null, Func<StatusCheck, Task<CheckResult>> evaluator = null, bool checkProxies = true)
         {
             if (evaluator == null)
             {
@@ -129,8 +129,20 @@ namespace StatusBoard.Core
             var allAsyncChecks = checks.Select(check => RunOneCheck(check, evaluator));
             var checkResults = (await Task.WhenAll(allAsyncChecks));
             var statusValues = checkResults.Select(r => r.StatusValue);
-            var worstResult = statusValues.Max();
             var message = string.Join(", ", statusValues.GroupBy(r => r).OrderByDescending(g => g.Key).Select(g => $"{g.Key} = {g.Count()}"));
+            if (checkProxies)
+            {
+                foreach (var proxy in proxies)
+                {
+                    var url = proxy.ProxyBaseUri + "/CheckAllNoProxy";
+                    System.Net.WebClient wc = new System.Net.WebClient();
+                    var result = await wc.DownloadStringTaskAsync(url);
+                    var allChecksResult = Newtonsoft.Json.JsonConvert.DeserializeObject<AllChecksResult>(result);
+                    statusValues = statusValues.Concat(new[] { allChecksResult.CheckResult.StatusValue });
+                    message += ", " + proxy.Title + ": " + allChecksResult.CheckResult.Message;
+                }
+            }
+            var worstResult = statusValues.Max();
             timer.Stop();
 
             int httpStatusCode = 200;
@@ -139,7 +151,7 @@ namespace StatusBoard.Core
                 httpStatusCode = 500;
             }
 
-            return WebResponse.JsonResponse(new
+            return WebResponse.JsonResponse(new AllChecksResult
             {
                 CurrentTime = DateTime.Now.ToString("u"),
                 CheckResult = new CheckResult(worstResult, message),

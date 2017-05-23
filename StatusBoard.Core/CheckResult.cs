@@ -22,6 +22,7 @@ namespace StatusBoard.Core
             StatusValue = statusValue;
         }
 
+        [JsonConstructor]
         public CheckResult(StatusValue statusValue, string message, bool useHtml = false) : this(statusValue)
         {
             Message = message;

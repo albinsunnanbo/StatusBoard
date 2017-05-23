@@ -87,6 +87,12 @@ namespace StatusBoard.Owin
                     context.WriteToOwinContext(webResponse);
                     return;
                 }
+                if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllNoProxy"), out remainingLevel2))
+                {
+                    var webResponse = await options.RunAllChecks(checkProxies: false);
+                    context.WriteToOwinContext(webResponse);
+                    return;
+                }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllFailOnWarning"), out remainingLevel2))
                 {
                     var webResponse = await options.RunAllChecks(StatusValue.WARNING);
