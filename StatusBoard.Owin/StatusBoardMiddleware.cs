@@ -61,9 +61,11 @@ namespace StatusBoard.Owin
                         {
                             var proxyBaseUrl = options.GetProxyBaseUri(proxyId).AbsoluteUri.TrimEnd('/');
                             var proxyCombinedUrl = proxyBaseUrl + remainingLevel3.Value;
-                            System.Net.WebClient wc = new System.Net.WebClient();
-                            var result = await wc.DownloadStringTaskAsync(proxyCombinedUrl);
-                            context.WriteToOwinContext(WebResponse.JsonResponse(result));
+                            using (var wc = new System.Net.WebClient())
+                            {
+                                var result = await wc.DownloadStringTaskAsync(proxyCombinedUrl);
+                                context.WriteToOwinContext(WebResponse.JsonResponse(result));
+                            }
                             return;
                         }
                     }

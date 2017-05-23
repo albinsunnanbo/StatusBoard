@@ -51,11 +51,18 @@ namespace StatusBoard.AspNetCore.Demo
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            app.UseStatusBoard(
-                Utilities.GetAllStatusChecksInAssembly(typeof(Core.StandardChecks.HttpCheck).Assembly)
+            var checks = Utilities.GetAllStatusChecksInAssembly(typeof(Core.StandardChecks.HttpCheck).Assembly)
                     .Concat(
-                Utilities.GetAllStatusChecksInAssembly(System.Reflection.Assembly.GetExecutingAssembly()))
-              );
+                Utilities.GetAllStatusChecksInAssembly(System.Reflection.Assembly.GetExecutingAssembly()));
+            var proxies = new List<Proxy>
+            {
+                new Proxy
+                {
+                    Title = "Recursive proxy to self",
+                    ProxyBaseUri = new Uri( "http://localhost:1546/Status"),
+                }
+            };
+            app.UseStatusBoard(checks, proxies);
 
             app.UseStaticFiles();
 

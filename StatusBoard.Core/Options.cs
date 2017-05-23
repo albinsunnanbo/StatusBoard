@@ -135,11 +135,13 @@ namespace StatusBoard.Core
                 foreach (var proxy in proxies)
                 {
                     var url = proxy.ProxyBaseUri + "/CheckAllNoProxy";
-                    System.Net.WebClient wc = new System.Net.WebClient();
-                    var result = await wc.DownloadStringTaskAsync(url);
-                    var allChecksResult = Newtonsoft.Json.JsonConvert.DeserializeObject<AllChecksResult>(result);
-                    statusValues = statusValues.Concat(new[] { allChecksResult.CheckResult.StatusValue });
-                    message += ", " + proxy.Title + ": " + allChecksResult.CheckResult.Message;
+                    using (var wc = new System.Net.WebClient())
+                    {
+                        var result = await wc.DownloadStringTaskAsync(url);
+                        var allChecksResult = Newtonsoft.Json.JsonConvert.DeserializeObject<AllChecksResult>(result);
+                        statusValues = statusValues.Concat(new[] { allChecksResult.CheckResult.StatusValue });
+                        message += ", " + proxy.Title + ": " + allChecksResult.CheckResult.Message;
+                    }
                 }
             }
             var worstResult = statusValues.Max();

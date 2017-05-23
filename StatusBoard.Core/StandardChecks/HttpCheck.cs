@@ -28,8 +28,10 @@ namespace StatusBoard.Core.StandardChecks
         {
             try
             {
-                System.Net.WebClient wc = new System.Net.WebClient();
-                var result = await wc.DownloadStringTaskAsync(uri);
+                using (var wc = new System.Net.WebClient())
+                {
+                    var result = await wc.DownloadStringTaskAsync(uri);
+                }
                 return CheckResult.ResultOk();
             }
             catch (Exception)

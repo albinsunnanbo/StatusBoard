@@ -16,11 +16,14 @@ namespace StatusBoard.Owin.Demo
             var checks = Utilities.GetAllStatusChecksInAssembly(typeof(Core.StandardChecks.HttpCheck).Assembly)
                     .Concat(
                 Utilities.GetAllStatusChecksInAssembly(System.Reflection.Assembly.GetExecutingAssembly()));
-            var proxies = new List<Proxy> {
-                new Proxy {
-                Title = "Recursive proxy to self",
-                ProxyBaseUri = new Uri( "http://localhost:39575/Status"),
-            } };
+            var proxies = new List<Proxy>
+            {
+                new Proxy
+                {
+                    Title = "Recursive proxy to self",
+                    ProxyBaseUri = new Uri( "http://localhost:39575/Status"),
+                }
+            };
             app.UseStatusBoard(checks, proxies);
         }
     }

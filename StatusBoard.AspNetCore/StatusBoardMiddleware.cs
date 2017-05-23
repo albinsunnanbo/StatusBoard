@@ -35,6 +35,7 @@ namespace StatusBoard.AspNetCore
         {
             PathString remainingLevel1;
             PathString remainingLevel2;
+            PathString remainingLevel3;
             if (context.Request.Path.StartsWithSegments(new PathString("/Status"), out remainingLevel1))
             {
                 if (!remainingLevel1.HasValue)
@@ -64,6 +65,31 @@ namespace StatusBoard.AspNetCore
                     await context.WriteToHttpContext(webResponse);
                     return;
                 }
+                if (remainingLevel1.StartsWithSegments(new PathString("/Proxy"), out remainingLevel2))
+                {
+                    if (remainingLevel2.HasValue)
+                    {
+                        var nextSlash = remainingLevel2.Value.IndexOf('/', 1);
+                        var proxyId = int.Parse(remainingLevel2.Value.Substring(1, nextSlash - 1));
+                        if (remainingLevel2.StartsWithSegments(new PathString("/" + proxyId), out remainingLevel3))
+                        {
+                            var proxyBaseUrl = options.GetProxyBaseUri(proxyId).AbsoluteUri.TrimEnd('/');
+                            var proxyCombinedUrl = proxyBaseUrl + remainingLevel3.Value;
+                            using (var wc = new System.Net.WebClient())
+                            {
+                                var result = await wc.DownloadStringTaskAsync(proxyCombinedUrl);
+                                await context.WriteToHttpContext(WebResponse.JsonResponse(result));
+                            }
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        var webResponse = options.GetProxyListing();
+                        await context.WriteToHttpContext(webResponse);
+                        return;
+                    }
+                }
                 if (remainingLevel1.StartsWithSegments(new PathString("/Check"), out remainingLevel2))
                 {
                     var checkId = remainingLevel2.Value.TrimStart('/');
@@ -74,6 +100,12 @@ namespace StatusBoard.AspNetCore
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAll"), out remainingLevel2))
                 {
                     var webResponse = await options.RunAllChecks(evaluator: EvaluateCoreCheck);
+                    await context.WriteToHttpContext(webResponse);
+                    return;
+                }
+                if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllNoProxy"), out remainingLevel2))
+                {
+                    var webResponse = await options.RunAllChecks(evaluator: EvaluateCoreCheck, checkProxies: false);
                     await context.WriteToHttpContext(webResponse);
                     return;
                 }
