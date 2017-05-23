@@ -83,15 +83,15 @@ namespace StatusBoard.Owin
                     context.WriteToOwinContext(webResponse);
                     return;
                 }
-                if (remainingLevel1.StartsWithSegments(new PathString("/CheckAll"), out remainingLevel2))
-                {
-                    var webResponse = await options.RunAllChecks();
-                    context.WriteToOwinContext(webResponse);
-                    return;
-                }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllNoProxy"), out remainingLevel2))
                 {
                     var webResponse = await options.RunAllChecks(checkProxies: false);
+                    context.WriteToOwinContext(webResponse);
+                    return;
+                }
+                if (remainingLevel1.StartsWithSegments(new PathString("/CheckAll"), out remainingLevel2))
+                {
+                    var webResponse = await options.RunAllChecks();
                     context.WriteToOwinContext(webResponse);
                     return;
                 }

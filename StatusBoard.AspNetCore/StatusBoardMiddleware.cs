@@ -97,15 +97,15 @@ namespace StatusBoard.AspNetCore
                     await context.WriteToHttpContext(webResponse);
                     return;
                 }
-                if (remainingLevel1.StartsWithSegments(new PathString("/CheckAll"), out remainingLevel2))
-                {
-                    var webResponse = await options.RunAllChecks(evaluator: EvaluateCoreCheck);
-                    await context.WriteToHttpContext(webResponse);
-                    return;
-                }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllNoProxy"), out remainingLevel2))
                 {
                     var webResponse = await options.RunAllChecks(evaluator: EvaluateCoreCheck, checkProxies: false);
+                    await context.WriteToHttpContext(webResponse);
+                    return;
+                }
+                if (remainingLevel1.StartsWithSegments(new PathString("/CheckAll"), out remainingLevel2))
+                {
+                    var webResponse = await options.RunAllChecks(evaluator: EvaluateCoreCheck);
                     await context.WriteToHttpContext(webResponse);
                     return;
                 }
