@@ -3,7 +3,7 @@
 (function () {
     "use strict";
 
-    var addCheck = function (check) {
+    var addCheck = function (check, proxyBase) {
         var resultElement = $(
             "<tr class='status-loading'>" +
             "<td class='check-result'>...</td>" +
@@ -15,7 +15,7 @@
         {
             type: "POST",
             async: true,
-            url: "Status/Check/" + check.CheckId,
+            url: "Status/" + proxyBase + "Check/" + check.CheckId,
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (data) {
@@ -41,25 +41,23 @@
         return resultElement;
     };
 
-    var loadTestsDirectory = function (placeHolder) {
+    var loadTestsDirectory = function (placeHolder, proxyBase) {
+        proxyBase = proxyBase || "";
         var tBody = placeHolder.find("tBody");
         // Fetch own checks
-        var url = "Status/Directory";
-        if (placeHolder.data.proxyId) {
-            url += "/" + placeHolder.data.proxyId;
-        }
+
         $.ajax(
             {
                 type: "POST",
                 async: true,
-                url: url,
+                url: "Status/" + proxyBase + "Directory",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (data) {
                     tBody.html('');
                     var checks = data.Checks;
                     $.each(checks, function (idx, check) {
-                        tBody.append(addCheck(check));
+                        tBody.append(addCheck(check, proxyBase));
                     });
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
@@ -90,8 +88,9 @@
                         var url = proxy.ProxyBaseUri;
                         var clone = placeHolderTemplate.clone();
                         clone.id = "proxy_" + idx;
-                        clone.data.proxyId = idx;
+                        var proxyBase = "Proxy/" + idx + "/";
                         proxyPlaceholder.append(clone);
+                        loadTestsDirectory(clone, proxyBase);
                     });
                 },
                 error: function (jqXHR, textStatus, errorThrown) {

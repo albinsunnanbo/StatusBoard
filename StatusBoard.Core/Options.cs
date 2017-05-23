@@ -68,9 +68,17 @@ namespace StatusBoard.Core
             var response = new
             {
                 CurrentTime = DateTime.Now.ToString("u"),
-                Proxies = proxies,
+                Proxies = proxies.Select(p => new
+                {
+                    p.Title,
+                }),
             };
             return WebResponse.JsonResponse(response);
+        }
+
+        public Uri GetProxyBaseUri(int proxyId)
+        {
+            return proxies[proxyId].ProxyBaseUri;
         }
 
         public async Task<WebResponse> RunCheck(string checkId)

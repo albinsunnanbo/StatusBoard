@@ -21,6 +21,7 @@ namespace StatusBoard.Owin
         {
             PathString remainingLevel1;
             PathString remainingLevel2;
+            PathString remainingLevel3;
             if (context.Request.Path.StartsWithSegments(new PathString("/Status"), out remainingLevel1))
             {
                 if (!remainingLevel1.HasValue)
@@ -54,7 +55,17 @@ namespace StatusBoard.Owin
                 {
                     if (remainingLevel2.HasValue)
                     {
-                        throw new NotImplementedException();
+                        var nextSlash = remainingLevel2.Value.IndexOf('/', 1);
+                        var proxyId = int.Parse(remainingLevel2.Value.Substring(1, nextSlash - 1));
+                        if (remainingLevel2.StartsWithSegments(new PathString("/" + proxyId), out remainingLevel3))
+                        {
+                            var proxyBaseUrl = options.GetProxyBaseUri(proxyId).AbsoluteUri.TrimEnd('/');
+                            var proxyCombinedUrl = proxyBaseUrl + remainingLevel3.Value;
+                            System.Net.WebClient wc = new System.Net.WebClient();
+                            var result = await wc.DownloadStringTaskAsync(proxyCombinedUrl);
+                            context.WriteToOwinContext(WebResponse.JsonResponse(result));
+                            return;
+                        }
                     }
                     else
                     {

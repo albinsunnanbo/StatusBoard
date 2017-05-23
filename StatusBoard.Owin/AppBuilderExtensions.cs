@@ -15,6 +15,10 @@ namespace Owin
         {
             app.UseStatusBoard(new Options(checks));
         }
+        public static void UseStatusBoard(this IAppBuilder app, IEnumerable<StatusCheck> checks, IEnumerable<Proxy> proxies)
+        {
+            app.UseStatusBoard(new Options(checks, proxies));
+        }
 
         public static void UseStatusBoard(
             this IAppBuilder app, Options options)
