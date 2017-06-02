@@ -10,9 +10,7 @@
     <projectUrl>https://github.com/albinsunnanbo/StatusBoard</projectUrl>
     <!--<iconUrl>https://raw.github.com/albinsunnanbo/StatusBoard/master/nuget/icon.png</iconUrl>-->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>
-      A ASP.NET Status Board framework, AspNetCore (Full .NET Framework) implementation
-    </description>
+    <description>A ASP.NET Status Board framework, AspNetCore (Full .NET Framework) implementation</description>
     <copyright>Copyright Albin Sunnanbo and contributors 2016</copyright>
     <tags>ASP.NET StatusBoard AspNetCore</tags>
     <releaseNotes />
