@@ -1,4 +1,4 @@
-v0.0.24 Added option in for UseDefaultCredentials in CertificateCheck
+v0.0.26 Added option in for UseDefaultCredentials in CertificateCheck
 v0.0.22 Added Proxy support - Make one Statusboard that aggregates other status boards
 v0.0.20 Prevent Intranet Mode in Internet explorer
 v0.0.18 StatusCheckCore - ASP.NET Core check with Dependency Injection support

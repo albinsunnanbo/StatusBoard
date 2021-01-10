@@ -12,7 +12,7 @@ namespace StatusBoard.Core.StandardChecks
     public abstract class CertificateCheck : StatusCheck
     {
         protected readonly Uri uri;
-        protected bool UseDefaultCredentials { get; } = false;
+        protected bool UseDefaultCredentials { get; set; } = false;
 
         public CertificateCheck(Uri uri)
         {
