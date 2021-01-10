@@ -11,7 +11,8 @@ namespace StatusBoard.Core.StandardChecks
 {
     public abstract class CertificateCheck : StatusCheck
     {
-        private readonly Uri uri;
+        protected readonly Uri uri;
+        protected bool UseDefaultCredentials { get; } = false;
 
         public CertificateCheck(Uri uri)
         {
@@ -57,6 +58,7 @@ namespace StatusBoard.Core.StandardChecks
         {
             //Do webrequest to get info on secure site
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+            request.UseDefaultCredentials = UseDefaultCredentials;
             request.ServerCertificateValidationCallback = ValidateServerCertificate;
 
             using (var response = await request.GetResponseAsync())
