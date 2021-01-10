@@ -70,10 +70,6 @@ namespace StatusBoard.Core.StandardChecks
                     return CheckResult.ResultError($"Certificate is not valid with policy errors {_sslPolicyErrors}. ChainErrors: {chainErrors}, Expiry date: {expiryDate}");
                 }
 
-                ////convert the X509Certificate to an X509Certificate2 object by passing it into the constructor
-                //X509Certificate2 cert2 = new X509Certificate2(_certificate);
-
-                //var isValid = cert2.Verify();
                 if (!isValid)
                 {
                     return CheckResult.ResultError($"Certificate is not valid. ChainErrors: {chainErrors}, Expiry date: {expiryDate}");
