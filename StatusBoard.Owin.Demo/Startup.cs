@@ -3,6 +3,7 @@ using Owin;
 using StatusBoard.Core;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Web;
 
@@ -21,7 +22,7 @@ namespace StatusBoard.Owin.Demo
                 new Proxy
                 {
                     Title = "Recursive proxy to self",
-                    ProxyBaseUri = new Uri( "http://localhost:39575/Status"),
+                    ProxyBaseUri = new Uri( ConfigurationManager.AppSettings["Proxy"]),
                 }
             };
             app.UseStatusBoard(checks, proxies);
