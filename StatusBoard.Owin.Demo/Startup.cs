@@ -14,9 +14,7 @@ namespace StatusBoard.Owin.Demo
     {
         public void Configuration(IAppBuilder app)
         {
-            var checks = Utilities.GetAllStatusChecksInAssembly(typeof(Core.StandardChecks.HttpCheck).Assembly)
-                    .Concat(
-                Utilities.GetAllStatusChecksInAssembly(System.Reflection.Assembly.GetExecutingAssembly()));
+            var checks = Utilities.GetAllStatusChecksInAssembly(System.Reflection.Assembly.GetExecutingAssembly());
             var proxies = new List<Proxy>
             {
                 new Proxy
@@ -25,7 +23,15 @@ namespace StatusBoard.Owin.Demo
                     ProxyBaseUri = new Uri( ConfigurationManager.AppSettings["Proxy"]),
                 }
             };
-            app.UseStatusBoard(checks, proxies);
+            Options options = new Options(checks, proxies);
+            options.CheckErrorHandler = StatusBoardCheckErrorHandler; 
+            app.UseStatusBoard(options);
+        }
+
+        private static CheckResult StatusBoardCheckErrorHandler(StatusCheck check, Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+            return CheckResult.ResultError(ex.ToString());
         }
     }
 }

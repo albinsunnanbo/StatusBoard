@@ -50,9 +50,7 @@ namespace StatusBoard.AspNetCore.Demo
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            var checks = Utilities.GetAllStatusChecksInAssembly(typeof(Core.StandardChecks.HttpCheck).Assembly)
-                    .Concat(
-                Utilities.GetAllStatusChecksInAssembly(System.Reflection.Assembly.GetExecutingAssembly()));
+            var checks = Utilities.GetAllStatusChecksInAssembly(System.Reflection.Assembly.GetExecutingAssembly());
             var proxies = new List<Proxy>
             {
                 new Proxy
