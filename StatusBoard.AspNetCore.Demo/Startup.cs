@@ -44,7 +44,6 @@ namespace StatusBoard.AspNetCore.Demo
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseBrowserLink();
             }
             else
             {
@@ -59,7 +58,7 @@ namespace StatusBoard.AspNetCore.Demo
                 new Proxy
                 {
                     Title = "Recursive proxy to self",
-                    ProxyBaseUri = new Uri( "http://localhost:1546/Status"),
+                    ProxyBaseUri = new Uri( "https://localhost:44384/Status"),
                 }
             };
             app.UseStatusBoard(checks, proxies);

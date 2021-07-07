@@ -1,14 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1401
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusBoard.Owin", "StatusBoard.Owin\StatusBoard.Owin.csproj", "{FFCC42F6-F42E-4C1C-AAD3-18BF3244EC46}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusBoard.Owin.Demo", "StatusBoard.Owin.Demo\StatusBoard.Owin.Demo.csproj", "{8052DA29-A2F8-4583-BA2E-CEA49B8F63C2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusBoard.Core", "StatusBoard.Core\StatusBoard.Core.csproj", "{76D416DA-32FA-4408-AEA5-9E751BB83D31}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{B5DEBB8F-F371-47E1-A774-FFB19FA9AD7B}"
 	ProjectSection(SolutionItems) = preProject
 		nuget\MakePackage.ps1 = nuget\MakePackage.ps1
@@ -26,9 +20,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		VersionInfo.cs = VersionInfo.cs
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusBoard.Owin", "StatusBoard.Owin\StatusBoard.Owin.csproj", "{FFCC42F6-F42E-4C1C-AAD3-18BF3244EC46}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusBoard.Owin.Demo", "StatusBoard.Owin.Demo\StatusBoard.Owin.Demo.csproj", "{8052DA29-A2F8-4583-BA2E-CEA49B8F63C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusBoard.Core", "StatusBoard.Core\StatusBoard.Core.csproj", "{76D416DA-32FA-4408-AEA5-9E751BB83D31}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusBoard.AspNetCore", "StatusBoard.AspNetCore\StatusBoard.AspNetCore.csproj", "{04175758-6FB3-40D8-A484-572EA8A9CCE3}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "StatusBoard.AspNetCore.Demo", "StatusBoard.AspNetCore.Demo\StatusBoard.AspNetCore.Demo.xproj", "{08AFB531-7DFA-43B6-917A-AFF5AFED3EEE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusBoard.AspNetCore.Demo", "StatusBoard.AspNetCore.Demo\StatusBoard.AspNetCore.Demo.csproj", "{C63E1D32-B3E7-45B8-BAE1-13E52507543F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -52,12 +52,15 @@ Global
 		{04175758-6FB3-40D8-A484-572EA8A9CCE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{04175758-6FB3-40D8-A484-572EA8A9CCE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{04175758-6FB3-40D8-A484-572EA8A9CCE3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{08AFB531-7DFA-43B6-917A-AFF5AFED3EEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{08AFB531-7DFA-43B6-917A-AFF5AFED3EEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{08AFB531-7DFA-43B6-917A-AFF5AFED3EEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{08AFB531-7DFA-43B6-917A-AFF5AFED3EEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C63E1D32-B3E7-45B8-BAE1-13E52507543F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C63E1D32-B3E7-45B8-BAE1-13E52507543F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C63E1D32-B3E7-45B8-BAE1-13E52507543F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C63E1D32-B3E7-45B8-BAE1-13E52507543F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B949EAE9-E7B6-4A48-8556-EF76D6766222}
 	EndGlobalSection
 EndGlobal
