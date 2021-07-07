@@ -12,9 +12,47 @@ namespace StatusBoard.Owin
     {
         readonly Core.Options options;
 
+        private class DummyCheck : StatusCheck
+        {
+            private readonly string message;
+
+            public override string Name => "DummyCheck";
+            public DummyCheck(string message)
+            {
+                this.message = message;
+            }
+
+            public override Task<CheckResult> GetCurrentStatus()
+            {
+                return Task.FromResult(CheckResult.ResultError(message));
+            }
+        }
+
         public StatusBoardMiddleware(OwinMiddleware next, Options options) : base(next)
         {
             this.options = options;
+
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    try
+                    {
+                        var sw = System.Diagnostics.Stopwatch.StartNew();
+                        cachedWebResponse = options.RunAllChecks(StatusValue.ERROR).Result;
+                        sw.Stop();
+                        if (sw.ElapsedMilliseconds > 100)
+                        {
+                            options.CheckErrorHandler(new DummyCheck("Background statuscheck exceeded 100 ms"), new Exception($"Background statuscheck took long time: {sw.Elapsed}"));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        cachedWebResponse = WebResponse.JsonResponse(options.CheckErrorHandler(new DummyCheck("Internal error in background check"), ex), 500);
+                    }
+                    System.Threading.Thread.Sleep(TimeSpan.FromSeconds(1));
+                }
+            });
         }
 
         public async override Task Invoke(IOwinContext context)
@@ -103,7 +141,7 @@ namespace StatusBoard.Owin
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllFailOnError"), out remainingLevel2))
                 {
-                    var webResponse = await options.RunAllChecks(StatusValue.ERROR, timeout: options.CheckAllFailOnErrorTimeout);
+                    var webResponse = cachedWebResponse ?? new WebResponse("Not initialized", "text/plain", 500);
                     context.WriteToOwinContext(webResponse);
                     return;
                 }
@@ -111,6 +149,48 @@ namespace StatusBoard.Owin
                 return;
             }
             await Next.Invoke(context);
+        }
+
+        private WebResponse cachedWebResponse = null;
+        private DateTimeOffset lastCheck;
+        private object _lock = new object();
+        private WebResponse GetRollingCacheResponse(Task<WebResponse> task)
+        {
+            bool fetch = false;
+            lock (_lock)
+            {
+                // First time
+                //if (cachedWebResponse == null)
+                //{
+                //    cachedWebResponse = task.Result;
+                //    lastCheck = DateTimeOffset.UtcNow;
+                //}
+                if (cachedWebResponse == null || (DateTimeOffset.UtcNow - lastCheck) < TimeSpan.FromSeconds(10))
+                //if ((DateTimeOffset.UtcNow - lastCheck) < TimeSpan.FromSeconds(1))
+                {
+                    fetch = true;
+                }
+            }
+            if (fetch)
+            {
+                task.ContinueWith(taskResult =>
+                {
+                    lock (_lock)
+                    {
+                        if (taskResult.Status == TaskStatus.RanToCompletion)
+                        {
+                            cachedWebResponse = taskResult.Result;
+                            lastCheck = DateTimeOffset.UtcNow;
+                        }
+                        else
+                        {
+                            cachedWebResponse = new WebResponse("ERROR", "text/plain", 500);
+                        }
+                    }
+                });
+            }
+
+            return cachedWebResponse ?? new WebResponse("Not initialized", "text/plain", 500);
         }
     }
 }
