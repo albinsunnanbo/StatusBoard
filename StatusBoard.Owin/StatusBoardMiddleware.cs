@@ -28,6 +28,9 @@ namespace StatusBoard.Owin
             }
         }
 
+        private WebResponse cachedWebResponse = null;
+
+
         public StatusBoardMiddleware(OwinMiddleware next, Options options) : base(next)
         {
             this.options = options;
@@ -151,46 +154,5 @@ namespace StatusBoard.Owin
             await Next.Invoke(context);
         }
 
-        private WebResponse cachedWebResponse = null;
-        private DateTimeOffset lastCheck;
-        private object _lock = new object();
-        private WebResponse GetRollingCacheResponse(Task<WebResponse> task)
-        {
-            bool fetch = false;
-            lock (_lock)
-            {
-                // First time
-                //if (cachedWebResponse == null)
-                //{
-                //    cachedWebResponse = task.Result;
-                //    lastCheck = DateTimeOffset.UtcNow;
-                //}
-                if (cachedWebResponse == null || (DateTimeOffset.UtcNow - lastCheck) < TimeSpan.FromSeconds(10))
-                //if ((DateTimeOffset.UtcNow - lastCheck) < TimeSpan.FromSeconds(1))
-                {
-                    fetch = true;
-                }
-            }
-            if (fetch)
-            {
-                task.ContinueWith(taskResult =>
-                {
-                    lock (_lock)
-                    {
-                        if (taskResult.Status == TaskStatus.RanToCompletion)
-                        {
-                            cachedWebResponse = taskResult.Result;
-                            lastCheck = DateTimeOffset.UtcNow;
-                        }
-                        else
-                        {
-                            cachedWebResponse = new WebResponse("ERROR", "text/plain", 500);
-                        }
-                    }
-                });
-            }
-
-            return cachedWebResponse ?? new WebResponse("Not initialized", "text/plain", 500);
-        }
     }
 }
