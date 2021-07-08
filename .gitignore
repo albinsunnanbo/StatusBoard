@@ -236,4 +236,5 @@ _Pvt_Extensions
 .fake/
 nuget/nuget.exe
 StatusBoard.Owin/StatusBoard.Owin.nuspec
+StatusBoard.AspNetCore/StatusBoard.AspNetCore.nuspec
 project.fragment.lock.json
