@@ -10,7 +10,8 @@ namespace StatusBoard.Owin
 {
     public class StatusBoardMiddleware : OwinMiddleware
     {
-        readonly Core.Options options;
+        private readonly Core.Options options;
+        private readonly BackgroundWorker bw;
 
         private class DummyCheck : StatusCheck
         {
@@ -28,34 +29,18 @@ namespace StatusBoard.Owin
             }
         }
 
-        private WebResponse cachedWebResponse = null;
 
 
         public StatusBoardMiddleware(OwinMiddleware next, Options options) : base(next)
         {
             this.options = options;
 
-            Task.Run(() =>
-            {
-                while (true)
-                {
-                    try
-                    {
-                        var sw = System.Diagnostics.Stopwatch.StartNew();
-                        cachedWebResponse = options.RunAllChecks(StatusValue.ERROR).Result;
-                        sw.Stop();
-                        if (sw.ElapsedMilliseconds > 100)
-                        {
-                            options.CheckErrorHandler(new DummyCheck("Background statuscheck exceeded 100 ms"), new Exception($"Background statuscheck took long time: {sw.Elapsed}"));
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        cachedWebResponse = WebResponse.JsonResponse(options.CheckErrorHandler(new DummyCheck("Internal error in background check"), ex), 500);
-                    }
-                    System.Threading.Thread.Sleep(TimeSpan.FromSeconds(1));
-                }
-            });
+
+            bw = new BackgroundWorker(
+                () => options.RunAllChecks(StatusValue.ERROR),
+                (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
+                TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(100)
+                );
         }
 
         public async override Task Invoke(IOwinContext context)
@@ -144,7 +129,7 @@ namespace StatusBoard.Owin
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllFailOnError"), out remainingLevel2))
                 {
-                    var webResponse = cachedWebResponse ?? new WebResponse("Not initialized", "text/plain", 500);
+                    var webResponse = bw.CachedWebResponse;
                     context.WriteToOwinContext(webResponse);
                     return;
                 }
