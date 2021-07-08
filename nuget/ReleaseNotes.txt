@@ -1,3 +1,4 @@
+v0.0.30 Fix NuGet package for the AspNetCore package
 v0.0.28 Breaking change: Removed Standard checks from Core package
         Added option for timeout
 v0.0.26 Added option UseDefaultCredentials in CertificateCheck

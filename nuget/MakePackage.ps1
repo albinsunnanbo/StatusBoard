@@ -70,6 +70,7 @@ function Create-Nuspec($projectName)
 }
 
 Create-Nuspec("StatusBoard.Owin")
+Create-Nuspec("StatusBoard.AspNetCore")
 echo "Checking if nuget exists"
 If((Test-Path -Path $pwd\nuget\nuget.exe) -eq $false) {
 	"nuget.exe does not exist"
