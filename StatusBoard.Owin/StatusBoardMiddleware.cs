@@ -79,31 +79,31 @@ namespace StatusBoard.Owin
                 if (remainingLevel1.StartsWithSegments(new PathString("/Check"), out remainingLevel2))
                 {
                     var checkId = remainingLevel2.Value.TrimStart('/');
-                    var webResponse = await options.RunCheck(checkId);
+                    var webResponse = await options.RunCheck(checkId, options.CheckIndividualTimeout);
                     context.WriteToOwinContext(webResponse);
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllNoProxy"), out remainingLevel2))
                 {
-                    var webResponse = await options.RunAllChecks(checkProxies: false);
+                    var webResponse = await options.RunAllChecks(checkProxies: false, timeout: options.CheckAllNoProxyTimeout);
                     context.WriteToOwinContext(webResponse);
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAll"), out remainingLevel2))
                 {
-                    var webResponse = await options.RunAllChecks();
+                    var webResponse = await options.RunAllChecks(timeout: options.CheckAllTimeout);
                     context.WriteToOwinContext(webResponse);
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllFailOnWarning"), out remainingLevel2))
                 {
-                    var webResponse = await options.RunAllChecks(StatusValue.WARNING);
+                    var webResponse = await options.RunAllChecks(StatusValue.WARNING, timeout: options.CheckAllFailOnWarningTimeout);
                     context.WriteToOwinContext(webResponse);
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllFailOnError"), out remainingLevel2))
                 {
-                    var webResponse = await options.RunAllChecks(StatusValue.ERROR);
+                    var webResponse = await options.RunAllChecks(StatusValue.ERROR, timeout: options.CheckAllFailOnErrorTimeout);
                     context.WriteToOwinContext(webResponse);
                     return;
                 }

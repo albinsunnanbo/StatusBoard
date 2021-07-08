@@ -59,7 +59,9 @@ namespace StatusBoard.AspNetCore.Demo
                     ProxyBaseUri = new Uri( "https://localhost:44384/Status"),
                 }
             };
-            app.UseStatusBoard(checks, proxies);
+            var options = new Options(checks, proxies);
+            options.CheckAllFailOnErrorTimeout = TimeSpan.FromSeconds(1);
+            app.UseStatusBoard(options);
 
             app.UseStaticFiles();
 

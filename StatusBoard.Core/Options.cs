@@ -17,6 +17,11 @@ namespace StatusBoard.Core
         public string StatusPageCss { get; set; } = Properties.Resources.StatusBoard_css;
         public string StatusPageJquery { get; set; } = Properties.Resources.jquery_2_2_3_min;
         public Func<StatusCheck, Exception, CheckResult> CheckErrorHandler { get; set; } = DefaultCheckErrorHandler;
+        public TimeSpan? CheckIndividualTimeout { get; set; } = null;
+        public TimeSpan? CheckAllTimeout { get; set; } = null;
+        public TimeSpan? CheckAllNoProxyTimeout { get; set; } = null;
+        public TimeSpan? CheckAllFailOnWarningTimeout { get; set; } = null;
+        public TimeSpan? CheckAllFailOnErrorTimeout { get; set; } = null;
 
         public Options(IEnumerable<StatusCheck> checks)
             : this(checks, Enumerable.Empty<Proxy>())
@@ -81,11 +86,11 @@ namespace StatusBoard.Core
             return proxies[proxyId].ProxyBaseUri;
         }
 
-        public async Task<WebResponse> RunCheck(string checkId)
+        public async Task<WebResponse> RunCheck(string checkId, TimeSpan? timeout)
         {
-            return await RunCheck(checkId, check => check.GetCurrentStatus());
+            return await RunCheck(checkId, check => check.GetCurrentStatus(), timeout);
         }
-        public async Task<WebResponse> RunCheck(string checkId, Func<StatusCheck, Task<CheckResult>> evaluator)
+        public async Task<WebResponse> RunCheck(string checkId, Func<StatusCheck, Task<CheckResult>> evaluator, TimeSpan? timeout)
         {
             var check = checks.SingleOrDefault(c => c.CheckId == checkId);
             if (check == null)
@@ -93,7 +98,7 @@ namespace StatusBoard.Core
                 throw new ArgumentException($"Check id {checkId} does not exist.", nameof(checkId));
             }
             var timer = Stopwatch.StartNew();
-            CheckResult checkResult = await RunOneCheck(check, evaluator);
+            CheckResult checkResult = await RunOneCheck(check, evaluator, timeout);
             timer.Stop();
             var response = new
             {
@@ -104,12 +109,42 @@ namespace StatusBoard.Core
             return WebResponse.JsonResponse(response);
         }
 
-        private async Task<CheckResult> RunOneCheck(StatusCheck check, Func<StatusCheck, Task<CheckResult>> evaluator)
+        private async Task<CheckResult> RunOneCheck(StatusCheck check, Func<StatusCheck, Task<CheckResult>> evaluator, TimeSpan? timeout)
         {
             CheckResult checkResult;
             try
             {
-                checkResult = await evaluator(check);
+                var task = evaluator(check);
+                var tasks = new Task[] { task };
+                var sw = System.Diagnostics.Stopwatch.StartNew();
+                if (timeout.HasValue)
+                {
+                    tasks = new[] { task, Task.Delay(timeout.Value) };
+                }
+                if (await Task.WhenAny(tasks) == task) // Timeout pattern
+                {
+                    // Success / fail from base class
+                    return task.Result;
+                }
+                else
+                {
+                    task.ContinueWith(t =>
+                    {
+                        if (t.Status == TaskStatus.Faulted)
+                        {
+                            DefaultCheckErrorHandler(check, t.Exception);
+                        }
+                        else
+                        {
+                            DefaultCheckErrorHandler(check, new TimeoutException($"Statuscheck '{check.Name}' finally completed with status {t.Status.ToString()} after {sw.Elapsed}"));
+                        }
+                    });
+                    // Fail
+                    //Logging.LogHelper.LogError($"Certcheck timeout {Name}", nameof(CertCheck));
+                    DefaultCheckErrorHandler(check, new TimeoutException($"Statuscheck '{check.Name}' did not complete within time limit {timeout.Value}"));
+
+                    return CheckResult.ResultWarning("Statuscheck timeout " + check.Name);
+                }
             }
             catch (Exception ex)
             {
@@ -119,14 +154,14 @@ namespace StatusBoard.Core
             return checkResult;
         }
 
-        public async Task<WebResponse> RunAllChecks(StatusValue? failLevel = null, Func<StatusCheck, Task<CheckResult>> evaluator = null, bool checkProxies = true)
+        public async Task<WebResponse> RunAllChecks(StatusValue? failLevel = null, Func<StatusCheck, Task<CheckResult>> evaluator = null, bool checkProxies = true, TimeSpan? timeout = null)
         {
             if (evaluator == null)
             {
                 evaluator = check => check.GetCurrentStatus();
             }
             var timer = Stopwatch.StartNew();
-            var allAsyncChecks = checks.Select(check => RunOneCheck(check, evaluator));
+            var allAsyncChecks = checks.Select(check => RunOneCheck(check, evaluator, timeout));
             var checkResults = (await Task.WhenAll(allAsyncChecks));
             var statusValues = checkResults.Select(r => r.StatusValue);
             var message = string.Join(", ", statusValues.GroupBy(r => r).OrderByDescending(g => g.Key).Select(g => $"{g.Key} = {g.Count()}"));

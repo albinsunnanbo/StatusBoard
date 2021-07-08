@@ -24,7 +24,8 @@ namespace StatusBoard.Owin.Demo
                 }
             };
             Options options = new Options(checks, proxies);
-            options.CheckErrorHandler = StatusBoardCheckErrorHandler; 
+            options.CheckErrorHandler = StatusBoardCheckErrorHandler;
+            options.CheckAllFailOnErrorTimeout = TimeSpan.FromSeconds(1);
             app.UseStatusBoard(options);
         }
 

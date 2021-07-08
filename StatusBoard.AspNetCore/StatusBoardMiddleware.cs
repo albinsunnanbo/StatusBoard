@@ -93,31 +93,31 @@ namespace StatusBoard.AspNetCore
                 if (remainingLevel1.StartsWithSegments(new PathString("/Check"), out remainingLevel2))
                 {
                     var checkId = remainingLevel2.Value.TrimStart('/');
-                    var webResponse = await options.RunCheck(checkId, EvaluateCoreCheck);
+                    var webResponse = await options.RunCheck(checkId, EvaluateCoreCheck, options.CheckIndividualTimeout);
                     await context.WriteToHttpContext(webResponse);
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllNoProxy"), out remainingLevel2))
                 {
-                    var webResponse = await options.RunAllChecks(evaluator: EvaluateCoreCheck, checkProxies: false);
+                    var webResponse = await options.RunAllChecks(evaluator: EvaluateCoreCheck, checkProxies: false, timeout: options.CheckAllNoProxyTimeout);
                     await context.WriteToHttpContext(webResponse);
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAll"), out remainingLevel2))
                 {
-                    var webResponse = await options.RunAllChecks(evaluator: EvaluateCoreCheck);
+                    var webResponse = await options.RunAllChecks(evaluator: EvaluateCoreCheck, timeout: options.CheckAllTimeout);
                     await context.WriteToHttpContext(webResponse);
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllFailOnWarning"), out remainingLevel2))
                 {
-                    var webResponse = await options.RunAllChecks(StatusValue.WARNING, EvaluateCoreCheck);
+                    var webResponse = await options.RunAllChecks(StatusValue.WARNING, EvaluateCoreCheck, timeout: options.CheckAllFailOnWarningTimeout);
                     await context.WriteToHttpContext(webResponse);
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllFailOnError"), out remainingLevel2))
                 {
-                    var webResponse = await options.RunAllChecks(StatusValue.ERROR, EvaluateCoreCheck);
+                    var webResponse = await options.RunAllChecks(StatusValue.ERROR, EvaluateCoreCheck, timeout: options.CheckAllFailOnErrorTimeout);
                     await context.WriteToHttpContext(webResponse);
                     return;
                 }
