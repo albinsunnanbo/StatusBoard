@@ -11,7 +11,7 @@ namespace StatusBoard.Owin
     public class StatusBoardMiddleware : OwinMiddleware
     {
         private readonly Core.Options options;
-        private readonly BackgroundWorker bw;
+        private readonly BackgroundWorker failOnErrorBackgroundWorker;
 
         private class DummyCheck : StatusCheck
         {
@@ -36,8 +36,8 @@ namespace StatusBoard.Owin
             this.options = options;
 
 
-            bw = new BackgroundWorker(
-                () => options.RunAllChecks(StatusValue.ERROR),
+            failOnErrorBackgroundWorker = new BackgroundWorker(
+                () => options.RunAllChecks(StatusValue.ERROR, timeout: options.CheckAllFailOnErrorTimeout),
                 (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
                 TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(100)
                 );
@@ -129,7 +129,7 @@ namespace StatusBoard.Owin
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllFailOnError"), out remainingLevel2))
                 {
-                    var webResponse = bw.CachedWebResponse;
+                    var webResponse = failOnErrorBackgroundWorker.CachedWebResponse;
                     context.WriteToOwinContext(webResponse);
                     return;
                 }

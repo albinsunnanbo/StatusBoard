@@ -23,7 +23,7 @@ namespace StatusBoard.Owin.Demo
                     ProxyBaseUri = new Uri( ConfigurationManager.AppSettings["Proxy"]),
                 }
             };
-            Options options = new Options(checks, proxies);
+            Options options = new Options(checks);
             options.CheckErrorHandler = StatusBoardCheckErrorHandler;
             options.CheckAllFailOnErrorTimeout = TimeSpan.FromSeconds(1);
             app.UseStatusBoard(options);
