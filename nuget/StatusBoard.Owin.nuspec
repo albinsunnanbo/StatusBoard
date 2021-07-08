@@ -5,10 +5,8 @@
     <version>$version$</version>
     <title>$title$</title>
     <authors>$author$</authors>
-    <owners>$author$</owners>
-    <licenseUrl>https://github.com/albinsunnanbo/StatusBoard/blob/master/LICENSE</licenseUrl>
+	<license type="expression">MIT</license>
     <projectUrl>https://github.com/albinsunnanbo/StatusBoard</projectUrl>
-    <!--<iconUrl>https://raw.github.com/albinsunnanbo/StatusBoard/master/nuget/icon.png</iconUrl>-->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A ASP.NET Status Board framework, OWIN implementation</description>
     <copyright>Copyright Albin Sunnanbo and contributors 2016</copyright>

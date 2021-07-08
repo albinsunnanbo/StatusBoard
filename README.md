@@ -20,6 +20,8 @@ Optionally create an CheckErrorHandler for global error handling
 		var options = new Options(statusChecks);
 		// Configure global error handler
 		options.CheckErrorHandler = StatusBoardCheckErrorHandler;
+		// Configure optional timeouts
+		options.CheckAllFailOnErrorTimeout = TimeSpan.FromSeconds(1);
 		app.UseStatusBoard(options);
 	}
 
