@@ -22,6 +22,10 @@ namespace StatusBoard.Core
         public TimeSpan? CheckAllNoProxyTimeout { get; set; } = null;
         public TimeSpan? CheckAllFailOnWarningTimeout { get; set; } = null;
         public TimeSpan? CheckAllFailOnErrorTimeout { get; set; } = null;
+        public bool RunCheckAllAsBackgroundWorker { get; set; }
+        public bool RunCheckAllNoProxyAsBackgroundWorker { get; set; }
+        public bool RunCheckAllFailOnWarningAsBackgroundWorker { get; set; }
+        public bool RunCheckAllFailOnErrorAsBackgroundWorker { get; set; }
 
         public Options(IEnumerable<StatusCheck> checks)
             : this(checks, Enumerable.Empty<Proxy>())

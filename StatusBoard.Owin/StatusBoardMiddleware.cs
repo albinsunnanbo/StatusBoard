@@ -11,7 +11,10 @@ namespace StatusBoard.Owin
     public class StatusBoardMiddleware : OwinMiddleware
     {
         private readonly Core.Options options;
-        private readonly BackgroundWorker failOnErrorBackgroundWorker;
+        private readonly BackgroundWorker checkAllNoProxyBackgroundWorker;
+        private readonly BackgroundWorker checkAllBackgroundWorker;
+        private readonly BackgroundWorker checkAllFailOnWarningBackgroundWorker;
+        private readonly BackgroundWorker checkAllFailOnErrorBackgroundWorker;
 
         private class DummyCheck : StatusCheck
         {
@@ -36,11 +39,38 @@ namespace StatusBoard.Owin
             this.options = options;
 
 
-            failOnErrorBackgroundWorker = new BackgroundWorker(
-                () => options.RunAllChecks(StatusValue.ERROR, timeout: options.CheckAllFailOnErrorTimeout),
-                (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
-                TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(100)
-                );
+            if (options.RunCheckAllNoProxyAsBackgroundWorker)
+            {
+                checkAllNoProxyBackgroundWorker = new BackgroundWorker(
+                    () => options.RunAllChecks(checkProxies: false, timeout: options.CheckAllNoProxyTimeout),
+                    (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
+                    TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(100)
+                    );
+            }
+            if (options.RunCheckAllAsBackgroundWorker)
+            {
+                checkAllBackgroundWorker = new BackgroundWorker(
+                    () => options.RunAllChecks(timeout: options.CheckAllTimeout),
+                    (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
+                    TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(100)
+                    );
+            }
+            if (options.RunCheckAllFailOnWarningAsBackgroundWorker)
+            {
+                checkAllFailOnWarningBackgroundWorker = new BackgroundWorker(
+                    () => options.RunAllChecks(StatusValue.WARNING, timeout: options.CheckAllFailOnWarningTimeout),
+                    (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
+                    TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(100)
+                    );
+            }
+            if (options.RunCheckAllFailOnErrorAsBackgroundWorker)
+            {
+                checkAllFailOnErrorBackgroundWorker = new BackgroundWorker(
+                    () => options.RunAllChecks(StatusValue.ERROR, timeout: options.CheckAllFailOnErrorTimeout),
+                    (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
+                    TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(100)
+                    );
+            }
         }
 
         public async override Task Invoke(IOwinContext context)
@@ -111,25 +141,57 @@ namespace StatusBoard.Owin
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllNoProxy"), out remainingLevel2))
                 {
-                    var webResponse = await options.RunAllChecks(checkProxies: false, timeout: options.CheckAllNoProxyTimeout);
+                    WebResponse webResponse;
+                    if (options.RunCheckAllNoProxyAsBackgroundWorker)
+                    {
+                        webResponse = checkAllNoProxyBackgroundWorker.CachedWebResponse;
+                    }
+                    else
+                    {
+                        webResponse = await options.RunAllChecks(checkProxies: false, timeout: options.CheckAllNoProxyTimeout);
+                    }
                     context.WriteToOwinContext(webResponse);
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAll"), out remainingLevel2))
                 {
-                    var webResponse = await options.RunAllChecks(timeout: options.CheckAllTimeout);
+                    WebResponse webResponse;
+                    if (options.RunCheckAllAsBackgroundWorker)
+                    {
+                        webResponse = checkAllBackgroundWorker.CachedWebResponse;
+                    }
+                    else
+                    {
+                        webResponse = await options.RunAllChecks(timeout: options.CheckAllTimeout);
+                    }
                     context.WriteToOwinContext(webResponse);
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllFailOnWarning"), out remainingLevel2))
                 {
-                    var webResponse = await options.RunAllChecks(StatusValue.WARNING, timeout: options.CheckAllFailOnWarningTimeout);
+                    WebResponse webResponse;
+                    if (options.RunCheckAllFailOnWarningAsBackgroundWorker)
+                    {
+                        webResponse = checkAllFailOnWarningBackgroundWorker.CachedWebResponse;
+                    }
+                    else
+                    {
+                        webResponse = await options.RunAllChecks(StatusValue.WARNING, timeout: options.CheckAllFailOnWarningTimeout);
+                    }
                     context.WriteToOwinContext(webResponse);
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllFailOnError"), out remainingLevel2))
                 {
-                    var webResponse = failOnErrorBackgroundWorker.CachedWebResponse;
+                    WebResponse webResponse;
+                    if (options.RunCheckAllFailOnErrorAsBackgroundWorker)
+                    {
+                        webResponse = checkAllFailOnErrorBackgroundWorker.CachedWebResponse;
+                    }
+                    else
+                    {
+                        webResponse = await options.RunAllChecks(StatusValue.ERROR, timeout: options.CheckAllFailOnWarningTimeout);
+                    }
                     context.WriteToOwinContext(webResponse);
                     return;
                 }
