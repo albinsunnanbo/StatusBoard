@@ -9,6 +9,8 @@ namespace StatusBoard.Core
     public abstract class StatusCheck
     {
         public abstract string Name { get; }
+        public TimeSpan? Timeout { get; protected set; }
+        public StatusValue TimeoutErrorLevel { get; protected set; } = StatusValue.ERROR;
 
         public virtual string CheckId
         {

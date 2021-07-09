@@ -114,12 +114,13 @@ namespace StatusBoard.Core
             CheckResult checkResult;
             try
             {
+                var timeoutCombined = check.Timeout ?? timeout;
                 var task = evaluator(check);
                 var tasks = new Task[] { task };
                 var sw = System.Diagnostics.Stopwatch.StartNew();
-                if (timeout.HasValue)
+                if (timeoutCombined.HasValue)
                 {
-                    tasks = new[] { task, Task.Delay(timeout.Value) };
+                    tasks = new[] { task, Task.Delay(timeoutCombined.Value) };
                 }
                 if (await Task.WhenAny(tasks) == task) // Timeout pattern
                 {
@@ -141,9 +142,9 @@ namespace StatusBoard.Core
                     });
                     // Fail
                     //Logging.LogHelper.LogError($"Certcheck timeout {Name}", nameof(CertCheck));
-                    DefaultCheckErrorHandler(check, new TimeoutException($"Statuscheck '{check.Name}' did not complete within time limit {timeout.Value}"));
+                    DefaultCheckErrorHandler(check, new TimeoutException($"Statuscheck '{check.Name}' did not complete within time limit {timeoutCombined.Value}"));
 
-                    return CheckResult.ResultWarning("Statuscheck timeout " + check.Name);
+                    return new CheckResult(check.TimeoutErrorLevel, "Statuscheck timeout " + check.Name);
                 }
             }
             catch (Exception ex)
