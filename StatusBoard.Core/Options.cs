@@ -26,6 +26,7 @@ namespace StatusBoard.Core
         public bool RunCheckAllNoProxyAsBackgroundWorker { get; set; }
         public bool RunCheckAllFailOnWarningAsBackgroundWorker { get; set; }
         public bool RunCheckAllFailOnErrorAsBackgroundWorker { get; set; }
+        public TimeSpan BackgroundworkerInterval { get; set; } = TimeSpan.FromSeconds(1);
 
         public Options(IEnumerable<StatusCheck> checks)
             : this(checks, Enumerable.Empty<Proxy>())

@@ -10,7 +10,7 @@ namespace StatusBoard.Core
     {
         public WebResponse CachedWebResponse { get; private set; } = new WebResponse("Not initialized", "text/plain", 500);
         
-        public BackgroundWorker(Func<Task<WebResponse>> task, Func<string, Exception, CheckResult> errorHandler, TimeSpan interval, TimeSpan longrunningWarning)
+        public BackgroundWorker(Func<Task<WebResponse>> task, Func<string, Exception, CheckResult> errorHandler, TimeSpan interval)
         {
             Task.Run(() =>
             {
@@ -21,10 +21,6 @@ namespace StatusBoard.Core
                         var sw = System.Diagnostics.Stopwatch.StartNew();
                         CachedWebResponse = task().Result;
                         sw.Stop();
-                        if (sw.Elapsed > longrunningWarning)
-                        {
-                            errorHandler($"Background statuscheck took long time: {sw.Elapsed}, limit {longrunningWarning}", new Exception($"Background statuscheck took long time: {sw.Elapsed}, limit {longrunningWarning}"));
-                        }
                     }
                     catch (Exception ex)
                     {

@@ -44,32 +44,28 @@ namespace StatusBoard.Owin
                 checkAllNoProxyBackgroundWorker = new BackgroundWorker(
                     () => options.RunAllChecks(checkProxies: false, timeout: options.CheckAllNoProxyTimeout),
                     (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
-                    TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(100)
-                    );
+                    options.BackgroundworkerInterval);
             }
             if (options.RunCheckAllAsBackgroundWorker)
             {
                 checkAllBackgroundWorker = new BackgroundWorker(
                     () => options.RunAllChecks(timeout: options.CheckAllTimeout),
                     (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
-                    TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(100)
-                    );
+                    options.BackgroundworkerInterval);
             }
             if (options.RunCheckAllFailOnWarningAsBackgroundWorker)
             {
                 checkAllFailOnWarningBackgroundWorker = new BackgroundWorker(
                     () => options.RunAllChecks(StatusValue.WARNING, timeout: options.CheckAllFailOnWarningTimeout),
                     (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
-                    TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(100)
-                    );
+                    options.BackgroundworkerInterval);
             }
             if (options.RunCheckAllFailOnErrorAsBackgroundWorker)
             {
                 checkAllFailOnErrorBackgroundWorker = new BackgroundWorker(
                     () => options.RunAllChecks(StatusValue.ERROR, timeout: options.CheckAllFailOnErrorTimeout),
                     (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
-                    TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(100)
-                    );
+                    options.BackgroundworkerInterval);
             }
         }
 
