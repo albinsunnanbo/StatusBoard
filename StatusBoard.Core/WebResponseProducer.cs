@@ -38,36 +38,29 @@ namespace StatusBoard.Core
 
             if (options.RunCheckAllNoProxyAsBackgroundWorker)
             {
-                checkAllNoProxyBackgroundWorker = new BackgroundWorker(
-                    () => options.RunAllChecks(checkProxies: false, timeout: options.CheckAllNoProxyTimeout, evaluator: this.evaluator),
-                    (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
-                    options.BackgroundworkerInterval
-                    );
+                checkAllNoProxyBackgroundWorker = InitBackgroundWorker(options, checkProxies: false, timeout: options.CheckAllNoProxyTimeout, evaluator: this.evaluator);
             }
             if (options.RunCheckAllAsBackgroundWorker)
             {
-                checkAllBackgroundWorker = new BackgroundWorker(
-                    () => options.RunAllChecks(timeout: options.CheckAllTimeout, evaluator: this.evaluator),
-                    (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
-                    options.BackgroundworkerInterval
-                    );
+                checkAllBackgroundWorker = InitBackgroundWorker(options, timeout: options.CheckAllTimeout, evaluator: this.evaluator);
             }
             if (options.RunCheckAllFailOnWarningAsBackgroundWorker)
             {
-                checkAllFailOnWarningBackgroundWorker = new BackgroundWorker(
-                    () => options.RunAllChecks(StatusValue.WARNING, timeout: options.CheckAllFailOnWarningTimeout, evaluator: this.evaluator),
-                    (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
-                    options.BackgroundworkerInterval
-                    );
+                checkAllFailOnWarningBackgroundWorker = InitBackgroundWorker(options, StatusValue.WARNING, timeout: options.CheckAllFailOnWarningTimeout, evaluator: this.evaluator);
             }
             if (options.RunCheckAllFailOnErrorAsBackgroundWorker)
             {
-                checkAllFailOnErrorBackgroundWorker = new BackgroundWorker(
-                    () => options.RunAllChecks(StatusValue.ERROR, timeout: options.CheckAllFailOnErrorTimeout, evaluator: this.evaluator),
-                    (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
-                    options.BackgroundworkerInterval
-                    );
+                checkAllFailOnErrorBackgroundWorker = InitBackgroundWorker(options, StatusValue.ERROR, timeout: options.CheckAllFailOnErrorTimeout, evaluator: this.evaluator);
             }
+        }
+
+        private static BackgroundWorker InitBackgroundWorker(Options options, StatusValue? failLevel = null, Func<StatusCheck, Task<CheckResult>> evaluator = null, bool checkProxies = true, TimeSpan? timeout = null)
+        {
+            return new BackgroundWorker(
+                                () => options.RunAllChecks(failLevel, evaluator, checkProxies, timeout),
+                                (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
+                                options.BackgroundworkerInterval
+                                );
         }
 
         public async Task<WebResponse> CreateWebResponse(string[] segments)
