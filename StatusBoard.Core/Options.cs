@@ -22,6 +22,11 @@ namespace StatusBoard.Core
         public TimeSpan? CheckAllNoProxyTimeout { get; set; } = null;
         public TimeSpan? CheckAllFailOnWarningTimeout { get; set; } = null;
         public TimeSpan? CheckAllFailOnErrorTimeout { get; set; } = null;
+        public bool RunCheckAllAsBackgroundWorker { get; set; }
+        public bool RunCheckAllNoProxyAsBackgroundWorker { get; set; }
+        public bool RunCheckAllFailOnWarningAsBackgroundWorker { get; set; }
+        public bool RunCheckAllFailOnErrorAsBackgroundWorker { get; set; }
+        public TimeSpan BackgroundworkerInterval { get; set; } = TimeSpan.FromSeconds(1);
 
         public Options(IEnumerable<StatusCheck> checks)
             : this(checks, Enumerable.Empty<Proxy>())
@@ -86,10 +91,6 @@ namespace StatusBoard.Core
             return proxies[proxyId].ProxyBaseUri;
         }
 
-        public async Task<WebResponse> RunCheck(string checkId, TimeSpan? timeout)
-        {
-            return await RunCheck(checkId, check => check.GetCurrentStatus(), timeout);
-        }
         public async Task<WebResponse> RunCheck(string checkId, Func<StatusCheck, Task<CheckResult>> evaluator, TimeSpan? timeout)
         {
             var check = checks.SingleOrDefault(c => c.CheckId == checkId);
@@ -117,7 +118,7 @@ namespace StatusBoard.Core
                 var timeoutCombined = check.Timeout ?? timeout;
                 var task = evaluator(check);
                 var tasks = new Task[] { task };
-                var sw = Stopwatch.StartNew();
+                var sw = System.Diagnostics.Stopwatch.StartNew();
                 if (timeoutCombined.HasValue)
                 {
                     tasks = new[] { task, Task.Delay(timeoutCombined.Value) };
@@ -144,7 +145,7 @@ namespace StatusBoard.Core
                     //Logging.LogHelper.LogError($"Certcheck timeout {Name}", nameof(CertCheck));
                     DefaultCheckErrorHandler(check, new TimeoutException($"Statuscheck '{check.Name}' did not complete within time limit {timeoutCombined.Value}"));
 
-                    return new CheckResult(check.TimeoutErrorLevel, "Statuscheck timeout");
+                    return new CheckResult(check.TimeoutErrorLevel, "Statuscheck timeout " + check.Name);
                 }
             }
             catch (Exception ex)
@@ -157,10 +158,6 @@ namespace StatusBoard.Core
 
         public async Task<WebResponse> RunAllChecks(StatusValue? failLevel = null, Func<StatusCheck, Task<CheckResult>> evaluator = null, bool checkProxies = true, TimeSpan? timeout = null)
         {
-            if (evaluator == null)
-            {
-                evaluator = check => check.GetCurrentStatus();
-            }
             var timer = Stopwatch.StartNew();
             var allAsyncChecks = checks.Select(check => RunOneCheck(check, evaluator, timeout));
             var checkResults = (await Task.WhenAll(allAsyncChecks));

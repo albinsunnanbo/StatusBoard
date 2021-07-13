@@ -61,6 +61,7 @@ namespace StatusBoard.AspNetCore.Demo
             };
             var options = new Options(checks, proxies);
             options.CheckAllFailOnErrorTimeout = TimeSpan.FromSeconds(1);
+            options.RunCheckAllFailOnErrorAsBackgroundWorker = true;
             app.UseStatusBoard(options);
 
             app.UseStaticFiles();

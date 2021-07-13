@@ -8,13 +8,59 @@ namespace StatusBoard.Core
 {
     public class WebResponseProducer
     {
+        private class DummyCheck : StatusCheck
+        {
+            private readonly string message;
+
+            public override string Name => "DummyCheck";
+            public DummyCheck(string message)
+            {
+                this.message = message;
+            }
+
+            public override Task<CheckResult> GetCurrentStatus()
+            {
+                return Task.FromResult(CheckResult.ResultError(message));
+            }
+        }
+
         private readonly Options options;
         private readonly Func<StatusCheck, Task<CheckResult>> evaluator;
+        private readonly BackgroundWorker checkAllNoProxyBackgroundWorker;
+        private readonly BackgroundWorker checkAllBackgroundWorker;
+        private readonly BackgroundWorker checkAllFailOnWarningBackgroundWorker;
+        private readonly BackgroundWorker checkAllFailOnErrorBackgroundWorker;
 
         public WebResponseProducer(Options options, Func<StatusCheck, Task<CheckResult>> evaluator)
         {
             this.options = options;
-            this.evaluator = evaluator;
+            this.evaluator = evaluator ?? (c => c.GetCurrentStatus());
+
+            if (options.RunCheckAllNoProxyAsBackgroundWorker)
+            {
+                checkAllNoProxyBackgroundWorker = InitBackgroundWorker(options, checkProxies: false, timeout: options.CheckAllNoProxyTimeout, evaluator: this.evaluator);
+            }
+            if (options.RunCheckAllAsBackgroundWorker)
+            {
+                checkAllBackgroundWorker = InitBackgroundWorker(options, timeout: options.CheckAllTimeout, evaluator: this.evaluator);
+            }
+            if (options.RunCheckAllFailOnWarningAsBackgroundWorker)
+            {
+                checkAllFailOnWarningBackgroundWorker = InitBackgroundWorker(options, StatusValue.WARNING, timeout: options.CheckAllFailOnWarningTimeout, evaluator: this.evaluator);
+            }
+            if (options.RunCheckAllFailOnErrorAsBackgroundWorker)
+            {
+                checkAllFailOnErrorBackgroundWorker = InitBackgroundWorker(options, StatusValue.ERROR, timeout: options.CheckAllFailOnErrorTimeout, evaluator: this.evaluator);
+            }
+        }
+
+        private static BackgroundWorker InitBackgroundWorker(Options options, StatusValue? failLevel = null, Func<StatusCheck, Task<CheckResult>> evaluator = null, bool checkProxies = true, TimeSpan? timeout = null)
+        {
+            return new BackgroundWorker(
+                                () => options.RunAllChecks(failLevel, evaluator, checkProxies, timeout),
+                                (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
+                                options.BackgroundworkerInterval
+                                );
         }
 
         public async Task<WebResponse> CreateWebResponse(string[] segments)
@@ -59,16 +105,44 @@ namespace StatusBoard.Core
                     webResponse = await options.RunCheck(checkId, evaluator, options.CheckIndividualTimeout);
                     return webResponse;
                 case "checkallnoproxy":
-                    webResponse = await options.RunAllChecks(checkProxies: false, timeout: options.CheckAllNoProxyTimeout, evaluator: evaluator);
+                    if (options.RunCheckAllNoProxyAsBackgroundWorker)
+                    {
+                        webResponse = checkAllNoProxyBackgroundWorker.CachedWebResponse;
+                    }
+                    else
+                    {
+                        webResponse = await options.RunAllChecks(checkProxies: false, timeout: options.CheckAllNoProxyTimeout, evaluator: evaluator);
+                    }
                     return webResponse;
                 case "checkall":
-                    webResponse = await options.RunAllChecks(timeout: options.CheckAllTimeout, evaluator: evaluator);
+                    if (options.RunCheckAllAsBackgroundWorker)
+                    {
+                        webResponse = checkAllBackgroundWorker.CachedWebResponse;
+                    }
+                    else
+                    {
+                        webResponse = await options.RunAllChecks(timeout: options.CheckAllTimeout, evaluator: evaluator);
+                    }
                     return webResponse;
                 case "checkallfailonwarning":
-                    webResponse = await options.RunAllChecks(StatusValue.WARNING, timeout: options.CheckAllFailOnWarningTimeout, evaluator: evaluator);
+                    if (options.RunCheckAllFailOnWarningAsBackgroundWorker)
+                    {
+                        webResponse = checkAllFailOnWarningBackgroundWorker.CachedWebResponse;
+                    }
+                    else
+                    {
+                        webResponse = await options.RunAllChecks(StatusValue.WARNING, timeout: options.CheckAllFailOnWarningTimeout, evaluator: evaluator);
+                    }
                     return webResponse;
                 case "checkallfailonerror":
-                    webResponse = await options.RunAllChecks(StatusValue.ERROR, timeout: options.CheckAllFailOnErrorTimeout, evaluator: evaluator);
+                    if (options.RunCheckAllFailOnErrorAsBackgroundWorker)
+                    {
+                        webResponse = checkAllFailOnErrorBackgroundWorker.CachedWebResponse;
+                    }
+                    else
+                    {
+                        webResponse = await options.RunAllChecks(StatusValue.ERROR, timeout: options.CheckAllFailOnErrorTimeout, evaluator: evaluator);
+                    }
                     return webResponse;
             }
             return null;
