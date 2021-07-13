@@ -22,6 +22,10 @@ namespace StatusBoard.Core
         public TimeSpan? CheckAllNoProxyTimeout { get; set; } = null;
         public TimeSpan? CheckAllFailOnWarningTimeout { get; set; } = null;
         public TimeSpan? CheckAllFailOnErrorTimeout { get; set; } = null;
+        public bool RunCheckAllAsBackgroundWorker { get; set; }
+        public bool RunCheckAllNoProxyAsBackgroundWorker { get; set; }
+        public bool RunCheckAllFailOnWarningAsBackgroundWorker { get; set; }
+        public bool RunCheckAllFailOnErrorAsBackgroundWorker { get; set; }
 
         public Options(IEnumerable<StatusCheck> checks)
             : this(checks, Enumerable.Empty<Proxy>())
@@ -117,7 +121,7 @@ namespace StatusBoard.Core
                 var timeoutCombined = check.Timeout ?? timeout;
                 var task = evaluator(check);
                 var tasks = new Task[] { task };
-                var sw = Stopwatch.StartNew();
+                var sw = System.Diagnostics.Stopwatch.StartNew();
                 if (timeoutCombined.HasValue)
                 {
                     tasks = new[] { task, Task.Delay(timeoutCombined.Value) };
@@ -144,7 +148,7 @@ namespace StatusBoard.Core
                     //Logging.LogHelper.LogError($"Certcheck timeout {Name}", nameof(CertCheck));
                     DefaultCheckErrorHandler(check, new TimeoutException($"Statuscheck '{check.Name}' did not complete within time limit {timeoutCombined.Value}"));
 
-                    return new CheckResult(check.TimeoutErrorLevel, "Statuscheck timeout");
+                    return new CheckResult(check.TimeoutErrorLevel, "Statuscheck timeout " + check.Name);
                 }
             }
             catch (Exception ex)
