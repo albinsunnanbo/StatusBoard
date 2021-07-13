@@ -34,12 +34,12 @@ namespace StatusBoard.Core
         public WebResponseProducer(Options options, Func<StatusCheck, Task<CheckResult>> evaluator)
         {
             this.options = options;
-            this.evaluator = evaluator;
+            this.evaluator = evaluator ?? (c => c.GetCurrentStatus());
 
             if (options.RunCheckAllNoProxyAsBackgroundWorker)
             {
                 checkAllNoProxyBackgroundWorker = new BackgroundWorker(
-                    () => options.RunAllChecks(checkProxies: false, timeout: options.CheckAllNoProxyTimeout, evaluator: evaluator),
+                    () => options.RunAllChecks(checkProxies: false, timeout: options.CheckAllNoProxyTimeout, evaluator: this.evaluator),
                     (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
                     options.BackgroundworkerInterval
                     );
@@ -47,7 +47,7 @@ namespace StatusBoard.Core
             if (options.RunCheckAllAsBackgroundWorker)
             {
                 checkAllBackgroundWorker = new BackgroundWorker(
-                    () => options.RunAllChecks(timeout: options.CheckAllTimeout, evaluator: evaluator),
+                    () => options.RunAllChecks(timeout: options.CheckAllTimeout, evaluator: this.evaluator),
                     (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
                     options.BackgroundworkerInterval
                     );
@@ -55,7 +55,7 @@ namespace StatusBoard.Core
             if (options.RunCheckAllFailOnWarningAsBackgroundWorker)
             {
                 checkAllFailOnWarningBackgroundWorker = new BackgroundWorker(
-                    () => options.RunAllChecks(StatusValue.WARNING, timeout: options.CheckAllFailOnWarningTimeout, evaluator: evaluator),
+                    () => options.RunAllChecks(StatusValue.WARNING, timeout: options.CheckAllFailOnWarningTimeout, evaluator: this.evaluator),
                     (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
                     options.BackgroundworkerInterval
                     );
@@ -63,7 +63,7 @@ namespace StatusBoard.Core
             if (options.RunCheckAllFailOnErrorAsBackgroundWorker)
             {
                 checkAllFailOnErrorBackgroundWorker = new BackgroundWorker(
-                    () => options.RunAllChecks(StatusValue.ERROR, timeout: options.CheckAllFailOnErrorTimeout, evaluator: evaluator),
+                    () => options.RunAllChecks(StatusValue.ERROR, timeout: options.CheckAllFailOnErrorTimeout, evaluator: this.evaluator),
                     (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
                     options.BackgroundworkerInterval
                     );

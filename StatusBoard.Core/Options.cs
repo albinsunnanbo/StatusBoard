@@ -91,10 +91,6 @@ namespace StatusBoard.Core
             return proxies[proxyId].ProxyBaseUri;
         }
 
-        public async Task<WebResponse> RunCheck(string checkId, TimeSpan? timeout)
-        {
-            return await RunCheck(checkId, check => check.GetCurrentStatus(), timeout);
-        }
         public async Task<WebResponse> RunCheck(string checkId, Func<StatusCheck, Task<CheckResult>> evaluator, TimeSpan? timeout)
         {
             var check = checks.SingleOrDefault(c => c.CheckId == checkId);
@@ -162,10 +158,6 @@ namespace StatusBoard.Core
 
         public async Task<WebResponse> RunAllChecks(StatusValue? failLevel = null, Func<StatusCheck, Task<CheckResult>> evaluator = null, bool checkProxies = true, TimeSpan? timeout = null)
         {
-            if (evaluator == null)
-            {
-                evaluator = check => check.GetCurrentStatus();
-            }
             var timer = Stopwatch.StartNew();
             var allAsyncChecks = checks.Select(check => RunOneCheck(check, evaluator, timeout));
             var checkResults = (await Task.WhenAll(allAsyncChecks));
