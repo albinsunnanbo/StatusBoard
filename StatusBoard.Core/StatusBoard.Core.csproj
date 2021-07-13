@@ -57,6 +57,7 @@
     <Compile Include="StatusValue.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="WebResponse.cs" />
+    <Compile Include="WebResponseProducer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

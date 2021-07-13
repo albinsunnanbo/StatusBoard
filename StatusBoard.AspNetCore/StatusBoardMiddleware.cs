@@ -13,12 +13,14 @@ namespace StatusBoard.AspNetCore
         readonly Core.Options options;
         readonly RequestDelegate next;
         readonly IServiceProvider serviceProvider;
+        readonly WebResponseProducer webResponseProducer;
 
         public StatusBoardMiddleware(RequestDelegate next, Options options, IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
             this.next = next;
             this.options = options;
+            this.webResponseProducer = new WebResponseProducer(options, EvaluateCoreCheck);
         }
 
         private async Task<CheckResult> EvaluateCoreCheck(StatusCheck check)
@@ -33,95 +35,22 @@ namespace StatusBoard.AspNetCore
 
         public async Task Invoke(HttpContext context)
         {
-            PathString remainingLevel1;
-            PathString remainingLevel2;
-            PathString remainingLevel3;
-            if (context.Request.Path.StartsWithSegments(new PathString("/Status"), out remainingLevel1))
+            var uri = new Uri("http://localhost" + context.Request.Path.Value); // Fake absolute path
+            var segments = uri.Segments;
+            if (segments.Length >= 2 && segments[1].ToLower().TrimEnd('/') == "status")
             {
-                if (!remainingLevel1.HasValue)
+                var webResponse = await webResponseProducer.CreateWebResponse(segments);
+                if (webResponse != null)
                 {
-                    var webResponse = options.GetStartPage();
                     await context.WriteToHttpContext(webResponse);
                     return;
                 }
-                if (remainingLevel1.StartsWithSegments(new PathString("/js"), out remainingLevel2))
+                if (segments[1].ToLower().EndsWith("/"))
                 {
-                    await context.WriteToHttpContext(options.GetJs());
+                    context.Response.Redirect(context.Request.Path.Value.Substring(0, context.Request.Path.Value.Length - 1));
                     return;
                 }
-                if (remainingLevel1.StartsWithSegments(new PathString("/css"), out remainingLevel2))
-                {
-                    await context.WriteToHttpContext(options.GetCss());
-                    return;
-                }
-                if (remainingLevel1.StartsWithSegments(new PathString("/jQuery"), out remainingLevel2))
-                {
-                    await context.WriteToHttpContext(options.GetJquery());
-                    return;
-                }
-                if (remainingLevel1.StartsWithSegments(new PathString("/Directory"), out remainingLevel2))
-                {
-                    var webResponse = options.GetDirectoryListing();
-                    await context.WriteToHttpContext(webResponse);
-                    return;
-                }
-                if (remainingLevel1.StartsWithSegments(new PathString("/Proxy"), out remainingLevel2))
-                {
-                    if (remainingLevel2.HasValue)
-                    {
-                        var nextSlash = remainingLevel2.Value.IndexOf('/', 1);
-                        var proxyId = int.Parse(remainingLevel2.Value.Substring(1, nextSlash - 1));
-                        if (remainingLevel2.StartsWithSegments(new PathString("/" + proxyId), out remainingLevel3))
-                        {
-                            var proxyBaseUrl = options.GetProxyBaseUri(proxyId).AbsoluteUri.TrimEnd('/');
-                            var proxyCombinedUrl = proxyBaseUrl + remainingLevel3.Value;
-                            using (var wc = new System.Net.WebClient())
-                            {
-                                var result = await wc.DownloadStringTaskAsync(proxyCombinedUrl);
-                                await context.WriteToHttpContext(WebResponse.JsonResponse(result));
-                            }
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        var webResponse = options.GetProxyListing();
-                        await context.WriteToHttpContext(webResponse);
-                        return;
-                    }
-                }
-                if (remainingLevel1.StartsWithSegments(new PathString("/Check"), out remainingLevel2))
-                {
-                    var checkId = remainingLevel2.Value.TrimStart('/');
-                    var webResponse = await options.RunCheck(checkId, EvaluateCoreCheck, options.CheckIndividualTimeout);
-                    await context.WriteToHttpContext(webResponse);
-                    return;
-                }
-                if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllNoProxy"), out remainingLevel2))
-                {
-                    var webResponse = await options.RunAllChecks(evaluator: EvaluateCoreCheck, checkProxies: false, timeout: options.CheckAllNoProxyTimeout);
-                    await context.WriteToHttpContext(webResponse);
-                    return;
-                }
-                if (remainingLevel1.StartsWithSegments(new PathString("/CheckAll"), out remainingLevel2))
-                {
-                    var webResponse = await options.RunAllChecks(evaluator: EvaluateCoreCheck, timeout: options.CheckAllTimeout);
-                    await context.WriteToHttpContext(webResponse);
-                    return;
-                }
-                if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllFailOnWarning"), out remainingLevel2))
-                {
-                    var webResponse = await options.RunAllChecks(StatusValue.WARNING, EvaluateCoreCheck, timeout: options.CheckAllFailOnWarningTimeout);
-                    await context.WriteToHttpContext(webResponse);
-                    return;
-                }
-                if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllFailOnError"), out remainingLevel2))
-                {
-                    var webResponse = await options.RunAllChecks(StatusValue.ERROR, EvaluateCoreCheck, timeout: options.CheckAllFailOnErrorTimeout);
-                    await context.WriteToHttpContext(webResponse);
-                    return;
-                }
-                await context.Response.WriteAsync("Invalid status request");
+                await context.Response.WriteAsync($"Invalid status request '{segments[1]}'");
                 return;
             }
             await next.Invoke(context);
