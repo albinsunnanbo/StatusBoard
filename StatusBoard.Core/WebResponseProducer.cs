@@ -41,7 +41,7 @@ namespace StatusBoard.Core
                 checkAllNoProxyBackgroundWorker = new BackgroundWorker(
                     () => options.RunAllChecks(checkProxies: false, timeout: options.CheckAllNoProxyTimeout, evaluator: evaluator),
                     (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
-                    TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(100)
+                    options.BackgroundworkerInterval
                     );
             }
             if (options.RunCheckAllAsBackgroundWorker)
@@ -49,7 +49,7 @@ namespace StatusBoard.Core
                 checkAllBackgroundWorker = new BackgroundWorker(
                     () => options.RunAllChecks(timeout: options.CheckAllTimeout, evaluator: evaluator),
                     (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
-                    TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(100)
+                    options.BackgroundworkerInterval
                     );
             }
             if (options.RunCheckAllFailOnWarningAsBackgroundWorker)
@@ -57,7 +57,7 @@ namespace StatusBoard.Core
                 checkAllFailOnWarningBackgroundWorker = new BackgroundWorker(
                     () => options.RunAllChecks(StatusValue.WARNING, timeout: options.CheckAllFailOnWarningTimeout, evaluator: evaluator),
                     (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
-                    TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(100)
+                    options.BackgroundworkerInterval
                     );
             }
             if (options.RunCheckAllFailOnErrorAsBackgroundWorker)
@@ -65,7 +65,7 @@ namespace StatusBoard.Core
                 checkAllFailOnErrorBackgroundWorker = new BackgroundWorker(
                     () => options.RunAllChecks(StatusValue.ERROR, timeout: options.CheckAllFailOnErrorTimeout, evaluator: evaluator),
                     (string err, Exception ex) => options.CheckErrorHandler(new DummyCheck(err), ex),
-                    TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(100)
+                    options.BackgroundworkerInterval
                     );
             }
         }
