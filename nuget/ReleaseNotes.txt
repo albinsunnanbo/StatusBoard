@@ -1,3 +1,4 @@
+v0.0.34 Bug: timeouts was logged to the DefaultCheckErrorHandler, not to the provided error handler if any
 v0.0.32 Add options for timeout on all checks
         Add options for running aggregate checks in the background and returning a cached result
 v0.0.30 Fix NuGet package for the AspNetCore package

@@ -134,16 +134,16 @@ namespace StatusBoard.Core
                     {
                         if (t.Status == TaskStatus.Faulted)
                         {
-                            DefaultCheckErrorHandler(check, t.Exception);
+                            CheckErrorHandler(check, t.Exception);
                         }
                         else
                         {
-                            DefaultCheckErrorHandler(check, new TimeoutException($"Statuscheck '{check.Name}' finally completed with status {t.Status.ToString()} after {sw.Elapsed}"));
+                            CheckErrorHandler(check, new TimeoutException($"Statuscheck '{check.Name}' finally completed with status {t.Status.ToString()} after {sw.Elapsed}"));
                         }
                     });
                     // Fail
                     //Logging.LogHelper.LogError($"Certcheck timeout {Name}", nameof(CertCheck));
-                    DefaultCheckErrorHandler(check, new TimeoutException($"Statuscheck '{check.Name}' did not complete within time limit {timeoutCombined.Value}"));
+                    CheckErrorHandler(check, new TimeoutException($"Statuscheck '{check.Name}' did not complete within time limit {timeoutCombined.Value}"));
 
                     return new CheckResult(check.TimeoutErrorLevel, "Statuscheck timeout " + check.Name);
                 }
