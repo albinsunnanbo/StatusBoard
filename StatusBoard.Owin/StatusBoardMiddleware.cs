@@ -27,28 +27,28 @@ namespace StatusBoard.Owin
                 if (!remainingLevel1.HasValue)
                 {
                     var webResponse = options.GetStartPage();
-                    context.WriteToOwinContext(webResponse);
+                    await context.WriteToOwinContext(webResponse);
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/js"), out remainingLevel2))
                 {
-                    context.WriteToOwinContext(options.GetJs());
+                    await context.WriteToOwinContext(options.GetJs());
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/css"), out remainingLevel2))
                 {
-                    context.WriteToOwinContext(options.GetCss());
+                    await context.WriteToOwinContext(options.GetCss());
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/jQuery"), out remainingLevel2))
                 {
-                    context.WriteToOwinContext(options.GetJquery());
+                    await context.WriteToOwinContext(options.GetJquery());
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/Directory"), out remainingLevel2))
                 {
                     var webResponse = options.GetDirectoryListing();
-                    context.WriteToOwinContext(webResponse);
+                    await context.WriteToOwinContext(webResponse);
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/Proxy"), out remainingLevel2))
@@ -64,7 +64,7 @@ namespace StatusBoard.Owin
                             using (var wc = new System.Net.WebClient())
                             {
                                 var result = await wc.DownloadStringTaskAsync(proxyCombinedUrl);
-                                context.WriteToOwinContext(WebResponse.JsonResponse(result));
+                                await context.WriteToOwinContext(WebResponse.JsonResponse(result));
                             }
                             return;
                         }
@@ -72,7 +72,7 @@ namespace StatusBoard.Owin
                     else
                     {
                         var webResponse = options.GetProxyListing();
-                        context.WriteToOwinContext(webResponse);
+                        await context.WriteToOwinContext(webResponse);
                         return;
                     }
                 }
@@ -80,34 +80,34 @@ namespace StatusBoard.Owin
                 {
                     var checkId = remainingLevel2.Value.TrimStart('/');
                     var webResponse = await options.RunCheck(checkId, options.CheckIndividualTimeout);
-                    context.WriteToOwinContext(webResponse);
+                    await context.WriteToOwinContext(webResponse);
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllNoProxy"), out remainingLevel2))
                 {
                     var webResponse = await options.RunAllChecks(checkProxies: false, timeout: options.CheckAllNoProxyTimeout);
-                    context.WriteToOwinContext(webResponse);
+                    await context.WriteToOwinContext(webResponse);
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAll"), out remainingLevel2))
                 {
                     var webResponse = await options.RunAllChecks(timeout: options.CheckAllTimeout);
-                    context.WriteToOwinContext(webResponse);
+                    await context.WriteToOwinContext(webResponse);
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllFailOnWarning"), out remainingLevel2))
                 {
                     var webResponse = await options.RunAllChecks(StatusValue.WARNING, timeout: options.CheckAllFailOnWarningTimeout);
-                    context.WriteToOwinContext(webResponse);
+                    await context.WriteToOwinContext(webResponse);
                     return;
                 }
                 if (remainingLevel1.StartsWithSegments(new PathString("/CheckAllFailOnError"), out remainingLevel2))
                 {
                     var webResponse = await options.RunAllChecks(StatusValue.ERROR, timeout: options.CheckAllFailOnErrorTimeout);
-                    context.WriteToOwinContext(webResponse);
+                    await context.WriteToOwinContext(webResponse);
                     return;
                 }
-                context.Response.Write("Invalid status request");
+                await context.Response.WriteAsync("Invalid status request");
                 return;
             }
             await Next.Invoke(context);

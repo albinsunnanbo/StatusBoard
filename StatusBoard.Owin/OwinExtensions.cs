@@ -10,14 +10,14 @@ namespace StatusBoard.Owin
 {
     public static class OwinExtensions
     {
-        public static void WriteToOwinContext(this IOwinContext context, WebResponse webResponse)
+        public static async Task WriteToOwinContext(this IOwinContext context, WebResponse webResponse)
         {
             context.Response.ContentType = webResponse.ContentType;
             if (webResponse.HttpStatusCode.HasValue)
             {
                 context.Response.StatusCode = webResponse.HttpStatusCode.Value;
             }
-            context.Response.Write(webResponse.Content);
+            await context.Response.WriteAsync(webResponse.Content);
         }
     }
 }
