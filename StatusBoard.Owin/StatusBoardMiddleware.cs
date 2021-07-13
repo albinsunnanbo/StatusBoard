@@ -107,7 +107,12 @@ namespace StatusBoard.Owin
                     await context.WriteToOwinContext(webResponse);
                     return;
                 }
-                await context.Response.WriteAsync("Invalid status request");
+                if (remainingLevel1.Value == "/")
+                {
+                    context.Response.Redirect(context.Request.Path.Value.Substring(0, context.Request.Path.Value.Length - 1));
+                    return;
+                }
+                await context.Response.WriteAsync($"Invalid status request '{remainingLevel1.Value}'");
                 return;
             }
             await Next.Invoke(context);
